@@ -12,4 +12,4 @@ def test_healthz_ok(client):
 def test_home_ok(client):
     response = client.get(reverse("core:home"))
     assert response.status_code == 200
-    assert "Setup Fase 0 berhasil" in response.content.decode()
+    assert "Setup Fase 1 berhasil" in response.content.decode()

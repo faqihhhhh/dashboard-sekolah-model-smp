@@ -9,3 +9,5 @@ media/
 db.sqlite3
 .idea/
 .vscode/
+bin/
+static/css/app.css

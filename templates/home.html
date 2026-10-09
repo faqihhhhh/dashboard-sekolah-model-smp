@@ -1,12 +1,14 @@
-<!doctype html>
-<html lang="id">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dasbor Sekolah Model</title>
-</head>
-<body>
-  <h1>Dasbor Sekolah Model</h1>
-  <p>Setup Fase 0 berhasil.</p>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Beranda{% endblock %}
+{% block heading %}Beranda{% endblock %}
+{% block content %}
+  <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+    <h2 class="text-xl font-semibold text-slate-900">Dasbor Sekolah Model</h2>
+    <p class="mt-2 text-sm text-slate-600">Setup Fase 1 berhasil. Isi Beranda akan dibangun pada fase berikutnya.</p>
+    {% if user.is_authenticated %}
+      <p class="mt-4 text-sm">Anda masuk sebagai <strong>{{ user.full_name }}</strong> ({{ user.get_role_display }}).</p>
+    {% else %}
+      <p class="mt-4 text-sm">Anda melihat tampilan publik (Guest). Masuk untuk melihat data lengkap.</p>
+    {% endif %}
+  </div>
+{% endblock %}

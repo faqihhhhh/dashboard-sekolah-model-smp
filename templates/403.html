@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Akses ditolak{% endblock %}
+{% block heading %}Akses ditolak{% endblock %}
+{% block content %}
+  <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+    <p class="text-sm text-slate-700">Anda tidak memiliki hak akses ke halaman ini.</p>
+    <a href="{% url 'core:home' %}" class="mt-4 inline-block text-sm font-medium text-blue-600 hover:underline">Kembali ke Beranda</a>
+  </div>
+{% endblock %}

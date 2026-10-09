@@ -3,6 +3,7 @@ name = "sekolah-model"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "argon2-cffi>=25.1.0",
     "django>=5.2,<5.3",
     "django-environ>=0.14.0",
     "gunicorn>=26.2.0",
@@ -30,3 +31,6 @@ extend-exclude = ["migrations"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"apps/*/migrations/*.py" = ["E501"]

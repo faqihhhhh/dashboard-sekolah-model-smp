@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Elemen Alpine yang disembunyikan sampai Alpine siap */
+[x-cloak] {
+  display: none !important;
+}

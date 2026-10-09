@@ -1,0 +1,86 @@
+{% load static %}<!doctype html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Beranda{% endblock %} · Dasbor Sekolah Model</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+  <script src="{% static 'vendor/alpine.min.js' %}" defer></script>
+</head>
+<body class="h-full bg-slate-100 font-sans text-slate-800"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div class="flex h-full" x-data="{ sidebarOpen: false }">
+
+  <div x-cloak x-show="sidebarOpen" @click="sidebarOpen = false"
+       class="fixed inset-0 z-30 bg-slate-900/50 md:hidden"></div>
+
+  <aside class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col bg-[#0b2447] text-slate-300 transition-transform md:static md:translate-x-0"
+         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+    <div class="flex h-14 items-center gap-3 border-b border-white/10 px-5">
+      <span class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-sm font-bold text-[#0b2447]">SM</span>
+      <span class="text-sm font-semibold text-white">Sekolah Model SMP</span>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-4" aria-label="Menu utama">
+      {% for section in nav_sections %}
+        <p class="mt-5 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 first:mt-0">{{ section.title }}</p>
+        <ul class="mt-2 space-y-1">
+          {% for item in section.items %}
+            <li>
+              {% if item.url %}
+                <a href="{{ item.url }}"
+                   class="block rounded-lg px-3 py-2 text-sm {% if item.active %}bg-blue-600 font-medium text-white{% else %}hover:bg-white/10 hover:text-white{% endif %}">{{ item.label }}</a>
+              {% else %}
+                <span class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-500">
+                  {{ item.label }}
+                  <span class="text-[10px] uppercase tracking-wide">segera</span>
+                </span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    </nav>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-6">
+      <div class="flex items-center gap-3">
+        <button type="button" @click="sidebarOpen = true" aria-label="Buka menu"
+                class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden">&#9776;</button>
+        <h1 class="text-lg font-semibold text-slate-900">{% block heading %}Beranda{% endblock %}</h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        {% if user.is_authenticated %}
+          <div class="hidden text-right leading-tight sm:block">
+            <p class="text-sm font-medium text-slate-900">{{ user.full_name }}</p>
+            <p class="text-xs text-slate-500">{{ user.get_role_display }}</p>
+          </div>
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Keluar</button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}"
+             class="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700">Masuk</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-6">
+      {% if messages %}
+        <div class="mb-4 space-y-2">
+          {% for message in messages %}
+            <div class="rounded-lg border px-4 py-3 text-sm {% if message.tags == 'error' %}border-red-200 bg-red-50 text-red-800{% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+</body>
+</html>

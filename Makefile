@@ -1,6 +1,6 @@
 # Baris perintah diawali tanda ">" (bukan TAB) agar aman disalin dari mana pun.
 .RECIPEPREFIX = >
-.PHONY: up down dev migrate test lint fmt shell check
+.PHONY: up down dev migrate makemigrations superuser test lint fmt shell check css css-watch vendor
 
 up:
 > docker compose up -d db
@@ -8,12 +8,18 @@ up:
 down:
 > docker compose down
 
-dev: up
+dev: up css
 > uv run python manage.py migrate
 > uv run python manage.py runserver
 
 migrate:
 > uv run python manage.py migrate
+
+makemigrations:
+> uv run python manage.py makemigrations
+
+superuser:
+> uv run python manage.py createsuperuser
 
 test:
 > uv run pytest
@@ -33,3 +39,16 @@ check:
 > uv run python manage.py check
 > $(MAKE) lint
 > $(MAKE) test
+
+# Tailwind CLI diunduh otomatis bila belum ada.
+bin/tailwindcss:
+> bash scripts/get_tailwind.sh
+
+css: bin/tailwindcss
+> ./bin/tailwindcss -i static/css/input.css -o static/css/app.css --minify
+
+css-watch: bin/tailwindcss
+> ./bin/tailwindcss -i static/css/input.css -o static/css/app.css --watch
+
+vendor:
+> bash scripts/get_vendor.sh

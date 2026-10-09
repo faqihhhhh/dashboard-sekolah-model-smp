@@ -1,0 +1,44 @@
+{% load static %}<!doctype html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masuk · Dasbor Sekolah Model</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="flex min-h-full items-center justify-center bg-[#0b2447] p-4 font-sans">
+  <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
+    <div class="mb-6 text-center">
+      <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-400 text-lg font-bold text-[#0b2447]">SM</span>
+      <h1 class="mt-4 text-xl font-semibold text-slate-900">Masuk</h1>
+      <p class="mt-1 text-sm text-slate-500">Dasbor Sekolah Model SMP</p>
+    </div>
+
+    <form method="post" class="space-y-4" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div>
+        <label for="{{ form.username.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">Email</label>
+        {{ form.username }}
+        {% for error in form.username.errors %}<p class="mt-1 text-xs text-red-600">{{ error }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="{{ form.password.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">Kata sandi</label>
+        {{ form.password }}
+        {% for error in form.password.errors %}<p class="mt-1 text-xs text-red-600">{{ error }}</p>{% endfor %}
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit"
+              class="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Masuk</button>
+    </form>
+
+    <a href="{% url 'core:home' %}" class="mt-6 block text-center text-sm text-slate-500 hover:text-slate-700">&larr; Kembali ke Beranda</a>
+  </div>
+</body>
+</html>
