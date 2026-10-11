@@ -11,3 +11,5 @@ db.sqlite3
 .vscode/
 bin/
 static/css/app.css
+.env.prod
+backup-*.sql.gz

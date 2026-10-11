@@ -1,0 +1,7 @@
+# SITE_ADDRESS diatur lewat .env.prod:
+#   :80                  -> HTTP saja (uji lokal / jaringan internal)
+#   sekolah.contoh.id    -> HTTPS otomatis (butuh domain dan port 80/443 terbuka)
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+	reverse_proxy web:8000
+}

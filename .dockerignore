@@ -1,0 +1,15 @@
+.git
+.venv
+.env
+.env.*
+bin/
+static/css/app.css
+staticfiles/
+media/
+tests/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.sqlite3
+backup-*.sql.gz

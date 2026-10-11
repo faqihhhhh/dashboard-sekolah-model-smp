@@ -1,6 +1,6 @@
 # Baris perintah diawali tanda ">" (bukan TAB) agar aman disalin dari mana pun.
 .RECIPEPREFIX = >
-.PHONY: up down dev migrate makemigrations superuser seed seed-demo demo-hapus wilayah-csv test lint fmt shell check css css-watch vendor
+.PHONY: prod-build prod-up prod-down prod-logs prod-ps prod-superuser prod-seed prod-backup up down dev migrate makemigrations superuser seed seed-demo demo-hapus wilayah-csv test lint fmt shell check css css-watch vendor
 
 up:
 > docker compose up -d db
@@ -51,6 +51,33 @@ check:
 > uv run python manage.py check
 > $(MAKE) lint
 > $(MAKE) test
+
+# --- Produksi (Docker Compose). Butuh file .env.prod (salin dari .env.prod.example) ---
+PROD = docker compose -f docker-compose.prod.yml --env-file .env.prod
+
+prod-build:
+> $(PROD) build
+
+prod-up:
+> $(PROD) up -d --build
+
+prod-down:
+> $(PROD) down
+
+prod-logs:
+> $(PROD) logs -f --tail=100
+
+prod-ps:
+> $(PROD) ps
+
+prod-superuser:
+> $(PROD) exec web python manage.py createsuperuser
+
+prod-seed:
+> $(PROD) exec web python manage.py seed_wilayah
+
+prod-backup:
+> $(PROD) exec -T db sh -c 'pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' | gzip > backup-$$(date +%F).sql.gz
 
 # Tailwind CLI diunduh otomatis bila belum ada.
 bin/tailwindcss:
