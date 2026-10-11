@@ -23,3 +23,7 @@ class RoleRequiredMixin(AccessMixin):
         if not has_role(request.user, self.min_role):
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
+
+
+class SuperAdminRequiredMixin(RoleRequiredMixin):
+    min_role = Role.SUPER_ADMIN

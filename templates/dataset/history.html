@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Riwayat {{ spec.label }}{% endblock %}
+{% block heading %}Riwayat perubahan{% endblock %}
+{% block content %}
+  <p class="mb-4 text-sm text-slate-600">{{ object }} · <a href="{{ back_url }}" class="font-medium text-blue-600 hover:underline">&larr; Kembali ke daftar</a></p>
+  <div class="space-y-3">
+    {% for entry in entries %}
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <span class="font-semibold text-slate-900">{{ entry.kind }}</span>
+          <span class="text-slate-500">
+            {{ entry.record.history_date|date:"d M Y, H:i" }} ·
+            {% if entry.record.history_user %}{{ entry.record.history_user.full_name }}{% else %}sistem{% endif %}
+          </span>
+        </div>
+        {% if entry.changes %}
+          <ul class="mt-3 space-y-1 text-sm">
+            {% for c in entry.changes %}
+              <li><span class="font-medium text-slate-700">{{ c.label }}:</span>
+                <span class="text-slate-500 line-through">{{ c.old }}</span>
+                &rarr; <span class="text-slate-900">{{ c.new }}</span></li>
+            {% endfor %}
+          </ul>
+        {% elif entry.kind != "Dibuat" %}
+          <p class="mt-2 text-sm text-slate-400">Tidak ada perubahan pada field yang dicatat.</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

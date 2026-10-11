@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Wilayah{% endblock %}
+{% block heading %}Wilayah{% endblock %}
+{% block content %}
+  <p class="mb-4 text-sm text-slate-600">
+    {{ total_provinsi }} provinsi · {{ total_kabkota }} kabupaten/kota (Kepmendagri 2025).
+    Untuk mengoreksi data atau menambah alias, gunakan <a href="/admin/referensi/" class="font-medium text-blue-600 hover:underline">halaman admin</a>.
+  </p>
+
+  <form method="get" class="mb-4 flex flex-wrap gap-3">
+    <input type="search" name="q" value="{{ q }}" placeholder="Cari nama atau kode..."
+           class="w-64 rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
+    <select name="provinsi"
+            class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
+      <option value="">Semua provinsi</option>
+      {% for p in provinsi_list %}
+        <option value="{{ p.kode }}" {% if p.kode == selected_provinsi %}selected{% endif %}>{{ p.nama }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Terapkan</button>
+    <a href="{% url 'referensi:wilayah_list' %}" class="self-center text-sm text-slate-600 hover:text-slate-900">Reset</a>
+  </form>
+
+  <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <tr>
+            <th class="px-4 py-3">Kode</th>
+            <th class="px-4 py-3">Nama</th>
+            <th class="px-4 py-3">Jenis</th>
+            <th class="px-4 py-3">Provinsi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for k in kabkota_list %}
+            <tr>
+              <td class="px-4 py-2.5 font-mono text-xs text-slate-500">{{ k.kode }}</td>
+              <td class="px-4 py-2.5 font-medium text-slate-900">{{ k.nama }}</td>
+              <td class="px-4 py-2.5">{{ k.get_jenis_display }}</td>
+              <td class="px-4 py-2.5 text-slate-600">{{ k.provinsi.nama }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="px-4 py-6 text-center text-slate-500">
+              {% if total_kabkota == 0 %}Data wilayah belum diisi. Jalankan <code>make seed</code>.{% else %}Tidak ada data yang cocok.{% endif %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "components/pagination.html" %}
+  </div>
+{% endblock %}

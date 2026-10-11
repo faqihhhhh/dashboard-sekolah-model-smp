@@ -2,7 +2,11 @@
 {% block title %}Pengguna{% endblock %}
 {% block heading %}Pengguna{% endblock %}
 {% block content %}
-  <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+  <div class="mb-4 flex justify-end">
+    <a href="{% url 'accounts:user_create' %}"
+       class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">+ Tambah pengguna</a>
+  </div>
+  <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
     <table class="min-w-full divide-y divide-slate-200 text-sm">
       <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
         <tr>
@@ -10,6 +14,7 @@
           <th class="px-4 py-3">Email</th>
           <th class="px-4 py-3">Peran</th>
           <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3 text-right">Aksi</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -21,9 +26,14 @@
             <td class="px-4 py-3">
               {% if u.is_active %}<span class="text-emerald-700">Aktif</span>{% else %}<span class="text-slate-400">Nonaktif</span>{% endif %}
             </td>
+            <td class="whitespace-nowrap px-4 py-3 text-right">
+              <a href="{% url 'accounts:user_update' u.pk %}" class="font-medium text-blue-600 hover:underline">Ubah</a>
+              <span class="px-1 text-slate-300">|</span>
+              <a href="{% url 'accounts:user_password' u.pk %}" class="font-medium text-blue-600 hover:underline">Kata sandi</a>
+            </td>
           </tr>
         {% empty %}
-          <tr><td colspan="4" class="px-4 py-6 text-center text-slate-500">Belum ada pengguna.</td></tr>
+          <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">Belum ada pengguna.</td></tr>
         {% endfor %}
       </tbody>
     </table>

@@ -20,6 +20,7 @@ NAV = [
         "Program",
         [
             NavItem("Beranda", "core:home"),
+            NavItem("Daftar Sekolah", "sekolah:list"),
             NavItem("Surat Dukungan"),
             NavItem("Baseline Sekolah"),
         ],
@@ -36,14 +37,15 @@ NAV = [
         "Administrasi",
         [
             NavItem("Pengguna", "accounts:user_list", Role.SUPER_ADMIN),
+            NavItem("Periode", "referensi:periode_list", Role.SUPER_ADMIN),
+            NavItem("Wilayah", "referensi:wilayah_list", Role.SUPER_ADMIN),
         ],
     ),
 ]
 
 
 def navigation(request):
-    match = getattr(request, "resolver_match", None)
-    current = match.view_name if match else None
+    path = request.path
     user = getattr(request, "user", None)
 
     sections = []
@@ -52,13 +54,10 @@ def navigation(request):
         for item in items:
             if item.min_role and not has_role(user, item.min_role):
                 continue
-            visible.append(
-                {
-                    "label": item.label,
-                    "url": reverse(item.url_name) if item.url_name else None,
-                    "active": item.url_name is not None and item.url_name == current,
-                }
-            )
+            url = reverse(item.url_name) if item.url_name else None
+            # Aktif bila URL cocok; untuk halaman selain "/" juga cocok pada sub-halamannya.
+            active = bool(url) and (path == url if url == "/" else path.startswith(url))
+            visible.append({"label": item.label, "url": url, "active": active})
         if visible:
             sections.append({"title": title, "items": visible})
     return {"nav_sections": sections}

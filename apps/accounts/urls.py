@@ -18,4 +18,7 @@ urlpatterns = [
     ),
     path("keluar/", auth_views.LogoutView.as_view(), name="logout"),
     path("pengguna/", views.UserListView.as_view(), name="user_list"),
+    path("pengguna/tambah/", views.UserCreateView.as_view(), name="user_create"),
+    path("pengguna/<int:pk>/ubah/", views.UserUpdateView.as_view(), name="user_update"),
+    path("pengguna/<int:pk>/kata-sandi/", views.UserPasswordView.as_view(), name="user_password"),
 ]

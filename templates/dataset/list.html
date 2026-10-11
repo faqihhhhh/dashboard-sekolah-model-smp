@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block heading %}{{ heading }}{% endblock %}
+{% block content %}
+  {% if not is_viewer %}
+    <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      Anda melihat data publik. <a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}" class="font-semibold underline">Masuk</a> untuk melihat kolom lengkap.
+    </div>
+  {% endif %}
+
+  <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <form method="get" class="flex flex-wrap gap-3">
+      {% if can_search %}
+        <input type="search" name="q" value="{{ q }}" placeholder="Cari..."
+               class="w-56 rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
+      {% endif %}
+      {% for f in filters %}
+        <select name="{{ f.name }}" aria-label="{{ f.label }}"
+                class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
+          <option value="">Semua {{ f.label|lower }}</option>
+          {% for value, label in f.options %}
+            <option value="{{ value }}" {% if value == f.selected %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      {% endfor %}
+      <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Terapkan</button>
+      <a href="{{ request.path }}" class="self-center text-sm text-slate-600 hover:text-slate-900">Reset</a>
+    </form>
+    <div class="flex gap-2">
+      {% if trash_url %}<a href="{{ trash_url }}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Terhapus</a>{% endif %}
+      {% if create_url %}<a href="{{ create_url }}" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">+ Tambah</a>{% endif %}
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <tr>
+            {% for label in columns %}<th class="whitespace-nowrap px-4 py-3">{{ label }}</th>{% endfor %}
+            {% if can_edit %}<th class="px-4 py-3 text-right">Aksi</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for row in rows %}
+            <tr>
+              {% for cell in row.cells %}<td class="px-4 py-2.5 {% if forloop.first %}font-mono text-xs text-slate-500{% endif %}">{{ cell }}</td>{% endfor %}
+              {% if can_edit %}
+                <td class="whitespace-nowrap px-4 py-2.5 text-right">
+                  <a href="{{ row.edit_url }}" class="font-medium text-blue-600 hover:underline">Ubah</a>
+                  <span class="px-1 text-slate-300">|</span>
+                  <a href="{{ row.history_url }}" class="font-medium text-blue-600 hover:underline">Riwayat</a>
+                  <span class="px-1 text-slate-300">|</span>
+                  <a href="{{ row.delete_url }}" class="font-medium text-red-600 hover:underline">Hapus</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="{{ columns|length|add:1 }}" class="px-4 py-8 text-center text-slate-500">Belum ada data yang cocok.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "components/pagination.html" %}
+  </div>
+{% endblock %}

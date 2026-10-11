@@ -1,6 +1,6 @@
 # Baris perintah diawali tanda ">" (bukan TAB) agar aman disalin dari mana pun.
 .RECIPEPREFIX = >
-.PHONY: up down dev migrate makemigrations superuser test lint fmt shell check css css-watch vendor
+.PHONY: up down dev migrate makemigrations superuser seed seed-demo demo-hapus wilayah-csv test lint fmt shell check css css-watch vendor
 
 up:
 > docker compose up -d db
@@ -20,6 +20,18 @@ makemigrations:
 
 superuser:
 > uv run python manage.py createsuperuser
+
+seed:
+> uv run python manage.py seed_wilayah
+
+seed-demo:
+> uv run python manage.py seed_demo_sekolah
+
+demo-hapus:
+> uv run python manage.py seed_demo_sekolah --hapus
+
+wilayah-csv:
+> uv run python scripts/build_wilayah_csv.py
 
 test:
 > uv run pytest
