@@ -7,7 +7,7 @@ mana yang boleh dilihat Guest, field untuk formulir, pencarian, filter, dan kunc
 perbarui daftar di sini.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -32,6 +32,7 @@ class DatasetSpec:
     filter_fields: tuple[str, ...] = ()
     natural_key: tuple[str, ...] = ()  # kunci pencocokan untuk impor
     time_field: str | None = None  # field tanggal/periode -> otomatis dapat chart perkembangan
+    default_aliases: dict[str, dict[str, str]] = field(default_factory=dict, compare=False)
 
     def __post_init__(self):
         names = {f.name for f in self.model._meta.get_fields()}
@@ -43,10 +44,16 @@ class DatasetSpec:
             "filter_fields": self.filter_fields,
             "natural_key": self.natural_key,
         }
+
         for group, fields in groups.items():
             unknown = [f for f in fields if f not in names]
             if unknown:
                 raise ImproperlyConfigured(f"{self.key}.{group}: field tidak ada: {unknown}")
+        unknown_aliases = [f for f in self.default_aliases if f not in names]
+        if unknown_aliases:
+            raise ImproperlyConfigured(
+                f"{self.key}.default_aliases: field tidak ada: {unknown_aliases}"
+            )
         if self.time_field and self.time_field not in names:
             raise ImproperlyConfigured(f"{self.key}.time_field tidak ada: {self.time_field}")
         outside = [f for f in self.public_fields if f not in self.list_fields]

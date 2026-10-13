@@ -34,5 +34,6 @@ SEKOLAH = register(
         search_fields=("npsn", "nama"),
         filter_fields=("provinsi", "status", "pengusul", "mapel_kka"),
         natural_key=("npsn",),
+        default_aliases={"pengusul": {"Pemda": "dinas", "Pemerintah Daerah": "dinas"}},
     )
 )
