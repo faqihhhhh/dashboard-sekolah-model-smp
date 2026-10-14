@@ -28,12 +28,10 @@
           {% for item in section.items %}
             {% if item.url %}
               <a href="{{ item.url }}" class="nav-item{% if item.active %} active{% endif %}"{% if item.active %} aria-current="page"{% endif %}>
-                <span class="nav-icon" aria-hidden="true">{{ item.label|slice:":1" }}</span>
                 <span>{{ item.label }}</span>
               </a>
             {% else %}
               <span class="nav-item nav-disabled" aria-disabled="true">
-                <span class="nav-icon" aria-hidden="true">{{ item.label|slice:":1" }}</span>
                 <span>{{ item.label }}</span><small>segera</small>
               </span>
             {% endif %}
