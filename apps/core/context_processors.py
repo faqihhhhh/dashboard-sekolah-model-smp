@@ -21,7 +21,7 @@ NAV = [
         [
             NavItem("Beranda", "core:home"),
             NavItem("Daftar Sekolah", "sekolah:list"),
-            NavItem("Surat Dukungan"),
+            NavItem("Surat Dukungan", "core:surat_dukungan"),
             NavItem("Baseline Sekolah"),
         ],
     ),
@@ -31,6 +31,13 @@ NAV = [
             NavItem("Direktorat SMP"),
             NavItem("BBPMP/BPMP"),
             NavItem("Dinas Pendidikan"),
+        ],
+    ),
+    (
+        "Sekolah",
+        [
+            NavItem("Kurasi"),
+            NavItem("Rencana Tindak Lanjut"),
         ],
     ),
     (

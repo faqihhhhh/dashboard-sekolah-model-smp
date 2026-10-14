@@ -36,8 +36,8 @@ Skala: ratusan sekolah, puluhan pengguna. Hosting belum ditentukan. Tidak ada pe
 
 Python 3.12 · Django 5.2 LTS · PostgreSQL 17 (18 mengubah path volume image) · django-simple-history 3.13.0 · argon2-cffi ·
 django-environ · gunicorn · whitenoise · **HTMX 2.0.11** · **Alpine.js 3.17.4** · **Tailwind CSS 4.3.3** (CLI mandiri, tanpa Node.js) ·
-uv · ruff · pytest-django · Docker Compose · Caddy 2.
-Belum terpasang, akan dibutuhkan: **openpyxl 3.1.5** (impor), **ECharts** (chart dan peta; simpan lokal di `static/vendor/`).
+uv · ruff · pytest-django · **openpyxl 3.1.5** (pembaca impor XLSX) · Docker Compose · Caddy 2.
+Belum terpasang, akan dibutuhkan: **ECharts** (chart dan peta; simpan lokal di `static/vendor/`).
 
 ## 4. Perintah (Makefile)
 
@@ -52,7 +52,7 @@ make seed-demo   # 60 sekolah FIKTIF (hanya DEBUG); hapus: make demo-hapus  (WAJ
 make dev         # build CSS + migrate + runserver  → http://localhost:8000
 make css | css-watch | vendor     # Tailwind / unduh library JS
 make fmt         # ruff check --fix + format
-make check       # django check + lint + pytest   (terakhir terverifikasi: 88 passed)
+make check       # django check + lint + pytest (terakhir terverifikasi: 154 passed)
 make wilayah-csv # bangun ulang apps/referensi/data/wilayah.csv (sumber: cahyadsn/wilayah, MIT, commit di-pin)
 make prod-up | prod-down | prod-ps | prod-logs | prod-superuser | prod-seed | prod-backup   # butuh .env.prod
 ```
@@ -68,6 +68,7 @@ apps/
   core/        models.py (TimeStamped, SoftDelete)  registry.py (DatasetSpec)  dataset_views.py (CRUD generik)
                history.py  forms.py (StyledFormMixin)  mixins.py  context_processors.py (menu sidebar: NAV)
   accounts/    User (login email), Role, permissions (RoleRequiredMixin, SuperAdminRequiredMixin, has_role), CRUD pengguna
+  imports/     readers.py (XLSX/CSV)  normalize.py (pilihan/wilayah)  engine.py (validasi + dry-run)
   referensi/   Provinsi, KabKota, AliasProvinsi, AliasKabKota, Periode, seed_wilayah, data/wilayah.csv
   sekolah/     Sekolah, dataset.py (spec), views/forms (dropdown kab/kota via HTMX), seed_demo_sekolah
 config/  docker/  scripts/  static/ (css/input.css, vendor/)  templates/ (base, form, components/, dataset/, ...)  tests/
@@ -145,6 +146,7 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
 - Dropdown kab/kota (HTMX) hanya mengisi ulang `<select>`; validasi server tetap membatasi pilihan menurut provinsi.
 - Docker tidak dapat diuji di sandbox AI; konfigurasi produksi hanya terverifikasi oleh pemilik di WSL.
 - `make seed-demo` membuat data fiktif (NPSN berawalan `99`, `extra.demo=true`) → hapus dengan `make demo-hapus` sebelum impor data asli.
+- Mesin impor tahap 2.1 dijalankan lewat `import_dryrun`; konfigurasi kolom JSON ditulis dan ditinjau Admin secara manual. Untuk CSV, encoding serta delimiter wajib dipilih.
 
 ## 10. Status dan peta jalan
 
@@ -154,9 +156,10 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
 - [x] **1.1–1.2** — layout sidebar (Tailwind + HTMX + Alpine), akun email, 4 peran, login/logout
 - [x] **1.3** — manajemen pengguna (Super Admin), data wilayah resmi, Periode
 - [x] **1.4** — Dataset Registry, Sekolah (CRUD, riwayat, soft delete/pulihkan, dropdown HTMX), data demo
+- [x] **Port tampilan prototipe** — shell, Beranda, dan Surat Dukungan dipindah ke template Django; KPI sekolah dinamis, fitur tanpa model ditampilkan sebagai belum tersedia
 - [x] **1.5** — Docker produksi (Dockerfile bertahap, compose + Caddy, `make prod-*`), diverifikasi pemilik
-- [ ] **Fase 2 — Mesin impor** (inti produk; belum ada `apps/imports/` di repo bila langkah 2.1 belum di-commit)
-  - [ ] 2.1 pembaca xlsx/csv aman, header bertingkat + sel gabungan, normalisasi (pilihan, wilayah), validasi + dry-run, perintah `import_dryrun`, `default_aliases` pada spec
+- [ ] **Fase 2 — Mesin impor** (inti produk)
+  - [x] 2.1 pembaca xlsx/csv aman, header bertingkat + sel gabungan, normalisasi (pilihan, wilayah), validasi + dry-run, perintah `import_dryrun`, `default_aliases` pada spec
   - [ ] 2.2 model `ImportBatch`, `MappingProfile`, `ValueAlias`; FK `import_batch` pada model yang diimpor; commit transaksional; rollback
   - [ ] 2.3 wizard UI (HTMX): unggah → sheet/header → pemetaan kolom (aksi massal) → profil → pemetaan nilai → dry-run → mode/konflik → simpan
   - [ ] 2.4 laporan error `.xlsx`, riwayat batch, unduh file asli, tombol rollback

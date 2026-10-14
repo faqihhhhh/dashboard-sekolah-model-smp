@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Surat Dukungan{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Surat Dukungan</h1>
+      <p class="muted">Rekap surat kesiapan satuan pendidikan dan dukungan bagi program Sekolah Model SMP.</p>
+    </div>
+    <div class="support-head-actions">
+      <span class="button-outline button-disabled" aria-disabled="true">Panduan format surat · segera</span>
+      <span class="button-green button-disabled" aria-disabled="true">Unduh rekapitulasi · segera</span>
+    </div>
+  </section>
+
+  <div class="feature-notice">
+    <span class="feature-notice-icon" aria-hidden="true">i</span>
+    <div><strong>Data surat belum tersedia</strong><p>Backend saat ini belum memiliki model untuk menyimpan surat, tautan dokumen, atau status verifikasinya. Ringkasan dan daftar di bawah akan terisi setelah modul Surat Dukungan dibangun.</p></div>
+  </div>
+
+  <section class="support-summary-grid" aria-label="Ringkasan kategori surat">
+    <article class="dashboard-card support-summary">
+      <h2>USULAN DINAS PENDIDIKAN</h2>
+      <div class="donut-placeholder"><span>—</span></div>
+      <p>Surat rekomendasi dan dukungan Dinas Pendidikan</p>
+      <div class="stat-subs support-counts"><span>Sudah: —</span><span>Belum: —</span></div>
+    </article>
+    <article class="dashboard-card support-summary">
+      <h2>USULAN DINAS PENDIDIKAN</h2>
+      <div class="donut-placeholder"><span>—</span></div>
+      <p>Surat kesiapan dan komitmen satuan pendidikan</p>
+      <div class="stat-subs support-counts"><span>Sudah: —</span><span>Belum: —</span></div>
+    </article>
+    <article class="dashboard-card support-summary partner">
+      <h2>USULAN MITRA</h2>
+      <div class="donut-placeholder partner"><span>—</span></div>
+      <p>Surat rekomendasi dan dukungan mitra pembangunan</p>
+      <div class="stat-subs support-counts"><span>Sudah: —</span><span>Belum: —</span></div>
+    </article>
+    <article class="dashboard-card support-summary partner">
+      <h2>USULAN MITRA</h2>
+      <div class="donut-placeholder partner"><span>—</span></div>
+      <p>Surat kesiapan dan komitmen satuan pendidikan</p>
+      <div class="stat-subs support-counts"><span>Sudah: —</span><span>Belum: —</span></div>
+    </article>
+  </section>
+
+  <section class="dashboard-card support-table-card">
+    <div class="card-heading">
+      <div><h3>Daftar sekolah — kelengkapan surat dukungan</h3><p class="muted">Status dokumen akan ditampilkan setelah datanya tersedia.</p></div>
+    </div>
+    <div class="support-table-wrap">
+      <table class="support-table">
+        <thead><tr><th>NO</th><th>NPSN</th><th>NAMA SEKOLAH</th><th>PROVINSI</th><th>KABUPATEN/KOTA</th><th>USULAN</th><th>SURAT DUKUNGAN</th><th>SURAT KESIAPAN</th></tr></thead>
+        <tbody><tr><td colspan="8" class="empty-cell">Data surat belum tersedia. Tidak ada status atau tautan dokumen yang ditampilkan.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

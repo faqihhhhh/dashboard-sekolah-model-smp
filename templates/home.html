@@ -1,14 +1,74 @@
 {% extends "base.html" %}
 {% block title %}Beranda{% endblock %}
-{% block heading %}Beranda{% endblock %}
 {% block content %}
-  <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-    <h2 class="text-xl font-semibold text-slate-900">Dasbor Sekolah Model</h2>
-    <p class="mt-2 text-sm text-slate-600">Setup Fase 1 berhasil. Isi Beranda akan dibangun pada fase berikutnya.</p>
-    {% if user.is_authenticated %}
-      <p class="mt-4 text-sm">Anda masuk sebagai <strong>{{ user.full_name }}</strong> ({{ user.get_role_display }}).</p>
-    {% else %}
-      <p class="mt-4 text-sm">Anda melihat tampilan publik (Guest). Masuk untuk melihat data lengkap.</p>
-    {% endif %}
-  </div>
+  <section class="dashboard-head">
+    <div>
+      <h1>Dasbor Program Sekolah Model SMP</h1>
+      <p class="muted">Ringkasan data sekolah untuk program Pembelajaran Mendalam dan Koding &amp; Kecerdasan Artifisial.</p>
+    </div>
+    <a class="button-outline" href="{% url 'sekolah:list' %}">Lihat daftar sekolah <span aria-hidden="true">→</span></a>
+  </section>
+
+  <section class="dashboard-hero">
+    <span class="hero-pill"><span class="dot"></span> Program Sekolah Model SMP</span>
+    <h2>Sekolah Model untuk Pembelajaran Mendalam dan Koding &amp; Kecerdasan Artifisial</h2>
+    <p>Satuan pendidikan SMP sebagai ruang percontohan dan pengembangan pembelajaran mendalam, computational thinking, serta Koding dan Kecerdasan Artifisial.</p>
+    <div class="hero-actions">
+      <a class="button-yellow" href="{% url 'sekolah:list' %}">Jelajahi data sekolah <span aria-hidden="true">→</span></a>
+      <span class="button-ghost button-disabled" aria-disabled="true">Panduan penyelenggaraan · segera</span>
+    </div>
+  </section>
+
+  <section class="stats-grid" aria-label="Ringkasan sekolah">
+    <article class="dashboard-card">
+      <div class="stat-top"><span class="stat-label">Total sekolah</span><span class="stat-icon" aria-hidden="true">▦</span></div>
+      <p class="stat-value">{{ totals.total }}</p>
+      <div class="stat-subs"><span><i class="dot blue"></i>{{ totals.negeri }} Negeri</span><span><i class="dot orange"></i>{{ totals.swasta }} Swasta</span></div>
+    </article>
+    <article class="dashboard-card">
+      <div class="stat-top"><span class="stat-label">Usulan Dinas Pendidikan</span><span class="stat-icon" aria-hidden="true">⌂</span></div>
+      <p class="stat-value">{{ totals.dinas }}</p>
+      <div class="stat-subs"><span><i class="dot blue"></i>{{ breakdown.dinas_negeri }} Negeri</span><span><i class="dot orange"></i>{{ breakdown.dinas_swasta }} Swasta</span></div>
+    </article>
+    <article class="dashboard-card">
+      <div class="stat-top"><span class="stat-label">Usulan Mitra</span><span class="stat-icon" aria-hidden="true">♧</span></div>
+      <p class="stat-value">{{ totals.mitra }}</p>
+      <div class="stat-subs"><span><i class="dot blue"></i>{{ breakdown.mitra_negeri }} Negeri</span><span><i class="dot orange"></i>{{ breakdown.mitra_swasta }} Swasta</span></div>
+    </article>
+    <article class="dashboard-card">
+      <div class="stat-top"><span class="stat-label">Pelaksana mapel KKA</span><span class="stat-icon" aria-hidden="true">⌘</span></div>
+      <p class="stat-value">{{ totals.kka }}</p>
+      <small class="muted">Sekolah dengan KKA sebagai mata pelajaran</small>
+    </article>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="dashboard-card">
+      <div class="card-heading">
+        <div><h3>Sekolah per provinsi</h3><p class="muted">Sepuluh provinsi dengan jumlah sekolah terbanyak.</p></div>
+        <span class="card-tag">Nasional</span>
+      </div>
+      <div class="province-heading"><span>PROVINSI</span><span>SEKOLAH</span></div>
+      {% for item in provinsi %}
+        <div class="province-row"><span>{{ item.provinsi__nama }}</span><span class="province-count">{{ item.total }}</span></div>
+      {% empty %}
+        <div class="empty-state">Belum ada data sekolah. Ringkasan akan muncul setelah data dimasukkan.</div>
+      {% endfor %}
+      <div class="province-action"><a class="button-outline" href="{% url 'sekolah:list' %}">Lihat daftar sekolah <span aria-hidden="true">→</span></a></div>
+    </article>
+
+    <div class="dashboard-stack">
+      <article class="dashboard-card">
+        <div class="card-heading"><div><h3>Baseline kesiapan sekolah</h3><p class="muted">Perkembangan hasil pengukuran.</p></div><span class="card-tag">Segera</span></div>
+        <div class="empty-state">Data baseline belum tersedia karena modul dan model datanya belum dibangun.</div>
+      </article>
+      <article class="dashboard-card">
+        <div class="card-heading"><div><h3>Modul program</h3><p class="muted">Data terhubung akan ditampilkan di sini.</p></div></div>
+        <div class="feature-notice">
+          <span class="feature-notice-icon" aria-hidden="true">i</span>
+          <div><strong>Surat Dukungan</strong><p>Halaman ringkasan tersedia, tetapi data surat belum tersambung ke backend.</p><a class="link" href="{% url 'core:surat_dukungan' %}">Buka halaman Surat Dukungan →</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
 {% endblock %}

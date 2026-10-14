@@ -134,6 +134,7 @@ def test_logout_harus_post(client_as):
 # --- Tampilan per peran ---
 
 
+@pytest.mark.django_db
 def test_guest_melihat_tombol_masuk_dan_tanpa_menu_pengguna(client):
     html = client.get(reverse("core:home")).content.decode()
     assert "Masuk" in html
