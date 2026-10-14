@@ -364,10 +364,10 @@ def import_wizard(request):
 
 
 RATING_COLORS = {
-    RatingIndikator.PRA_BERKEMBANG: "#f97316",
-    RatingIndikator.BERKEMBANG: "#eab308",
-    RatingIndikator.MAJU: "#22c55e",
-    RatingIndikator.UNGGUL: "#2563eb",
+    RatingIndikator.PRA_BERKEMBANG: "#b9794b",
+    RatingIndikator.BERKEMBANG: "#c2a25b",
+    RatingIndikator.MAJU: "#78936d",
+    RatingIndikator.UNGGUL: "#3e6d5b",
 }
 
 
@@ -401,8 +401,8 @@ def _baseline_donut(period, framework):
     ]
     segments.extend(
         [
-            {"label": "Tidak terkategori", "count": not_categorized, "color": "#64748b"},
-            {"label": "Belum diisi", "count": missing, "color": "#e2e8f0"},
+            {"label": "Tidak terkategori", "count": not_categorized, "color": "#8c948d"},
+            {"label": "Belum diisi", "count": missing, "color": "#e7ebe5"},
         ]
     )
     angle = 0.0
@@ -473,8 +473,8 @@ def detail(request, pk):
         HasilBaseline.objects.filter(sekolah=baseline.sekolah).select_related("periode"),
         time_field="periode",
         value_fields=(
-            ("skor_pm", "Skor PM", "#2563eb"),
-            ("skor_kka", "Skor KKA", "#059669"),
+            ("skor_pm", "Skor PM", "#547a61"),
+            ("skor_kka", "Skor KKA", "#a27a4d"),
         ),
     )
     is_admin = has_role(request.user, Role.ADMIN)

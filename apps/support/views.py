@@ -123,7 +123,7 @@ def _cumulative_chart(schools, documents):
         (Pengusul.MITRA, JenisSurat.REKOMENDASI): "Mitra · Rekomendasi",
         (Pengusul.MITRA, JenisSurat.KESIAPAN): "Mitra · Kesiapan",
     }
-    colors = ("#2563eb", "#60a5fa", "#059669", "#34d399")
+    colors = ("#547a61", "#8ba27d", "#a27a4d", "#c2a25b")
     events = Counter()
     for school in schools:
         for document in documents[school.pk].values():

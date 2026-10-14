@@ -61,10 +61,10 @@
   };
 
   const colorFor = (value, max) => {
-    if (!value) return "#eef2f7";
+    if (!value) return "#edf1eb";
     const ratio = max ? value / max : 0;
     const lightness = 86 - ratio * 38;
-    return `hsl(217 78% ${lightness}%)`;
+    return `hsl(145 24% ${lightness}%)`;
   };
 
   const loadMap = async () => {
