@@ -7,7 +7,9 @@ from django.core.management import call_command
 from django.db import IntegrityError, transaction
 
 from apps.baseline.importing import (
+    BaselineCommitBlocked,
     BaselineMapping,
+    commit_baseline_preview,
     run_baseline_dry_run,
     transform_indicator_values,
 )
@@ -21,6 +23,7 @@ from apps.baseline.models import (
     RatingIndikator,
 )
 from apps.imports.readers import Table
+from apps.imports.rollback import rollback_batch
 from apps.referensi.models import Periode
 
 pytestmark = pytest.mark.django_db
@@ -307,3 +310,125 @@ def test_dry_run_baseline_mengabaikan_kolom_kosong_saat_pembaruan(make_sekolah):
     assert preview.counts()["unchanged"] == 1
     assert preview.rows[0].values == {}
     assert preview.rows[0].indicators == []
+
+
+def test_commit_baseline_menyimpan_ringkasan_rating_dan_batch(make_sekolah, make_user):
+    school = make_sekolah()
+    user = make_user("admin")
+    period = Periode.objects.create(
+        nama="Baseline Commit", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+    table = Table(
+        name="SMP",
+        rows=[["NPSN", "Skor PM", "PM | 1.1.1"], [school.npsn, "2.5", "Maju"]],
+        n_cols=3,
+    )
+    mapping = BaselineMapping(
+        npsn_header="NPSN",
+        summary_columns={"skor_pm": "Skor PM"},
+        indicator_columns={"PM | 1.1.1": indicator},
+    )
+    preview = run_baseline_dry_run(table, periode=period, mapping=mapping)
+
+    result = commit_baseline_preview(
+        preview, periode=period, mapping=mapping, user=user, filename="baseline.xlsx"
+    )
+
+    baseline = HasilBaseline.objects.get(sekolah=school, periode=period)
+    rating = HasilIndikator.objects.get(hasil_baseline=baseline, indikator=indicator)
+    assert result.created == 1
+    assert result.batch.dataset_key == "baseline"
+    assert result.batch.created_by == user
+    assert baseline.import_batch == result.batch
+    assert rating.rating == RatingIndikator.MAJU
+    assert rating.import_batch == result.batch
+    assert baseline.history.first().history_user == user
+
+    rolled_back = rollback_batch(result.batch, user)
+    baseline.refresh_from_db()
+    rating.refresh_from_db()
+    assert rolled_back["soft_deleted"] == 2
+    assert baseline.is_deleted
+    assert rating.is_deleted
+
+
+def test_rollback_batch_baseline_memulihkan_perubahan(make_sekolah, make_user):
+    school = make_sekolah()
+    user = make_user("admin")
+    period = Periode.objects.create(
+        nama="Baseline Pulihkan Perubahan", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+    baseline = HasilBaseline.objects.create(
+        sekolah=school,
+        periode=period,
+        skor_pm=Decimal("2.5"),
+        profil_data={"catatan": "awal"},
+    )
+    rating = HasilIndikator.objects.create(
+        hasil_baseline=baseline, indikator=indicator, rating=RatingIndikator.MAJU
+    )
+    table = Table(
+        name="SMP",
+        rows=[
+            ["NPSN", "Skor PM", "Catatan", "PM | 1.1.1"],
+            [school.npsn, "3.5", "baru", "Unggul"],
+        ],
+        n_cols=4,
+    )
+    mapping = BaselineMapping(
+        npsn_header="NPSN",
+        summary_columns={"skor_pm": "Skor PM"},
+        profile_columns={"Catatan": "catatan"},
+        indicator_columns={"PM | 1.1.1": indicator},
+    )
+    preview = run_baseline_dry_run(table, periode=period, mapping=mapping)
+    committed = commit_baseline_preview(
+        preview, periode=period, mapping=mapping, user=user, filename="baseline-update.xlsx"
+    )
+
+    assert committed.updated == 1
+    baseline.refresh_from_db()
+    rating.refresh_from_db()
+    assert baseline.skor_pm == Decimal("3.5")
+    assert baseline.profil_data["catatan"] == "baru"
+    assert rating.rating == RatingIndikator.UNGGUL
+
+    result = rollback_batch(committed.batch, user)
+    baseline.refresh_from_db()
+    rating.refresh_from_db()
+    assert result["reverted"] == 2
+    assert baseline.skor_pm == Decimal("2.5")
+    assert baseline.profil_data == {"catatan": "awal"}
+    assert rating.rating == RatingIndikator.MAJU
+
+
+def test_commit_baseline_membatalkan_semua_jika_preview_error(make_sekolah, make_user):
+    school = make_sekolah()
+    user = make_user("admin")
+    period = Periode.objects.create(
+        nama="Baseline Commit Gagal", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    table = Table(
+        name="SMP",
+        rows=[["NPSN", "Profil PM"], [school.npsn, "Nilai"], ["buruk", "Nilai"]],
+        n_cols=2,
+    )
+    mapping = BaselineMapping(npsn_header="NPSN", summary_columns={"profil_pm": "Profil PM"})
+    preview = run_baseline_dry_run(table, periode=period, mapping=mapping)
+
+    with pytest.raises(BaselineCommitBlocked):
+        commit_baseline_preview(preview, periode=period, mapping=mapping, user=user)
+
+    assert HasilBaseline.objects.count() == 0

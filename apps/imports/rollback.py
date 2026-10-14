@@ -44,6 +44,11 @@ def rollback_batch(batch: ImportBatch, user, reason: str | None = None) -> dict[
             raise ValueError(err_msg)
         raise PermissionDenied(err_msg)
 
+    if batch.dataset_key == "baseline":
+        from apps.baseline.importing import rollback_baseline_batch
+
+        return rollback_baseline_batch(batch, user, reason)
+
     spec = get_spec(batch.dataset_key)
     change_log = batch.change_log or {}
     created_pks = change_log.get("created_pks", [])
