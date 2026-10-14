@@ -8,9 +8,9 @@ from apps.sekolah.models import MapelKKA, Pengusul, Sekolah, StatusSekolah
 
 def parse_home_filters(params):
     filters = {}
-    province_id = params.get("provinsi", "")
-    if province_id.isdigit() and Provinsi.objects.filter(pk=int(province_id)).exists():
-        filters["provinsi"] = int(province_id)
+    province_code = params.get("provinsi", "")
+    if province_code.isdigit() and Provinsi.objects.filter(kode=province_code).exists():
+        filters["provinsi"] = province_code
     for name, choices in (
         ("status", StatusSekolah.choices),
         ("pengusul", Pengusul.choices),
@@ -25,7 +25,7 @@ def parse_home_filters(params):
 def school_queryset(filters):
     queryset = Sekolah.objects.all()
     if "provinsi" in filters:
-        queryset = queryset.filter(provinsi_id=filters["provinsi"])
+        queryset = queryset.filter(provinsi__kode=filters["provinsi"])
     for name in ("status", "pengusul", "mapel_kka"):
         if name in filters:
             queryset = queryset.filter(**{name: filters[name]})
@@ -51,7 +51,7 @@ def home_aggregates(filters=None):
     )
     province_filter = Q(sekolah__deleted_at__isnull=True)
     for name, value in filters.items():
-        lookup = {"provinsi": "provinsi_id"}.get(name, name)
+        lookup = {"provinsi": "provinsi__kode"}.get(name, name)
         province_filter &= Q(**{f"sekolah__{lookup}": value})
     provinces = list(
         Provinsi.objects.annotate(

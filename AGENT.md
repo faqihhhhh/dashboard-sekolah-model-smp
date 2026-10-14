@@ -175,9 +175,9 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Dashboard agregat dan donut PM/KKA; Guest tidak menerima data sekolah
   - [x] Panduan indikator publik; detail hasil untuk Viewer+; edit rating ber-riwayat untuk Admin+
   - [x] Komponen SVG perkembangan generik berdasarkan field waktu; detail sekolah menampilkan tren skor lintas periode
-- [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
+- [x] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
   - [x] Filter bersama untuk KPI dan tabel seluruh provinsi; endpoint agregat hanya mengirim hitungan publik
-  - [ ] Peta choropleth; menunggu sumber GeoJSON 38 provinsi yang lisensinya terverifikasi
+  - [x] Peta choropleth lokal tanpa CDN, dapat dipilih dengan mouse/keyboard; kode Papua hasil pemekaran dipetakan eksplisit dan dicocokkan ke kode Kemendagri
 - [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif
 - [ ] **Fase 7 — Hardening dan deploy final** — rate limit login, header keamanan, audit dependensi, cadangan + uji restore, domain/HTTPS, README/runbook/panduan Admin, UAT
@@ -192,7 +192,7 @@ Tanyakan bila terhalang; jangan mengarang kebutuhan.
 
 ## 12. Pertanyaan terbuka (butuh jawaban pemilik)
 
-1. Sumber GeoJSON 38 provinsi untuk peta (harus memuat provinsi Papua hasil pemekaran; periksa lisensi).
+1. Provenance upstream GeoJSON perlu ditinjau kembali sebelum aset peta dipakai dalam distribusi produksi/komersial (lisensi dataset CC BY 4.0; lihat `static/data/README.md`).
 2. Spesifikasi Kurasi dan Rencana Tindak Lanjut.
 3. Pelaksana intervensi: teks bebas atau tabel master per penyelenggara? (saran: master)
 4. Status intervensi: eksplisit atau diturunkan dari tanggal realisasi? (saran: eksplisit + validasi)

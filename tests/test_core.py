@@ -1,7 +1,34 @@
+import csv
+import json
+from pathlib import Path
+
 import pytest
 from django.urls import reverse
 
 from apps.accounts.models import Role
+
+
+def test_geojson_peta_memuat_38_provinsi_dengan_kode_kemendagri():
+    data_path = Path(__file__).resolve().parents[1] / "static/data/indonesia-38-provinces.geojson"
+    geojson = json.loads(data_path.read_text(encoding="utf-8"))
+    features = geojson["features"]
+    papua_codes = {
+        "Papua Selatan": "93",
+        "Papua Tengah": "94",
+        "Papua Pegunungan": "95",
+        "Papua Barat Daya": "96",
+    }
+    map_codes = {
+        papua_codes.get(feature["properties"]["PROVINSI"], feature["properties"]["KODE_PROV"])
+        for feature in features
+    }
+    csv_path = Path(__file__).resolve().parents[1] / "apps/referensi/data/wilayah.csv"
+    with csv_path.open(encoding="utf-8", newline="") as source:
+        official_codes = {row["kode"] for row in csv.DictReader(source) if "." not in row["kode"]}
+
+    assert len(features) == 38
+    assert len({feature["properties"]["PROVINSI"] for feature in features}) == 38
+    assert map_codes == official_codes
 
 
 @pytest.mark.django_db
@@ -38,21 +65,28 @@ def test_home_menampilkan_ringkasan_publik_per_peran(client, client_as, make_sek
 
 
 @pytest.mark.django_db
-def test_filter_beranda_diterapkan_konsisten_ke_kpi_dan_provinsi(client, make_sekolah):
+def test_filter_beranda_diterapkan_konsisten_ke_kpi_dan_provinsi(client, make_sekolah, wilayah):
     make_sekolah(status="negeri", pengusul="dinas", mapel_kka="pelaksana")
-    make_sekolah(status="swasta", pengusul="mitra", mapel_kka="bukan")
+    make_sekolah(
+        status="swasta",
+        pengusul="mitra",
+        mapel_kka="bukan",
+        provinsi=wilayah.jatim,
+        kabkota=wilayah.malang,
+    )
 
     response = client.get(
-        reverse("core:home"), {"status": "negeri", "pengusul": "dinas", "mapel_kka": "pelaksana"}
+        reverse("core:home"),
+        {"provinsi": "35", "status": "swasta", "pengusul": "mitra", "mapel_kka": "bukan"},
     )
 
     assert response.status_code == 200
     assert response.context["totals"]["total"] == 1
-    assert response.context["totals"]["dinas"] == 1
-    assert response.context["totals"]["mitra"] == 0
+    assert response.context["totals"]["dinas"] == 0
+    assert response.context["totals"]["mitra"] == 1
     assert [(item.nama, item.total) for item in response.context["provinsi"]] == [
-        ("Jawa Barat", 1),
-        ("Jawa Timur", 0),
+        ("Jawa Barat", 0),
+        ("Jawa Timur", 1),
     ]
 
 

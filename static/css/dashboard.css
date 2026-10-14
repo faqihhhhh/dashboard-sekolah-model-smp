@@ -152,6 +152,12 @@ button, input, select, textarea { font-family: inherit; }
 .province-row { min-height: 42px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 12px; }
 .province-count { min-width: 32px; padding: 4px 9px; border-radius: 6px; background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 750; text-align: center; }
 .province-action { margin-top: 16px; }
+.province-map-wrap { margin: 4px 0 18px; padding: 12px; border: 1px solid #e8edf5; border-radius: 12px; background: #f8fafc; }
+.province-map { display: block; width: 100%; height: auto; min-height: 220px; }
+.province-shape { stroke: #fff; stroke-width: .55; cursor: pointer; transition: filter .12s, stroke-width .12s; }
+.province-shape:hover, .province-shape:focus { filter: brightness(.88); stroke: #0f2a52; stroke-width: 1.2; outline: none; }
+.map-caption, .map-error { margin: 5px 4px 0; color: var(--dashboard-muted); font-size: 11px; line-height: 1.5; }
+.map-error { color: #b91c1c; }
 .empty-state { padding: 24px 16px; border: 1px dashed #cbd5e1; border-radius: 10px; background: #f8fafc; color: var(--dashboard-muted); font-size: 12px; line-height: 1.6; text-align: center; }
 
 /* Notice Banner */

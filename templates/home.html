@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+{% block extra_js %}<script src="{% static 'js/province-map.js' %}" defer></script>{% endblock %}
 {% block title %}Beranda{% endblock %}
 {% block content %}
   <section class="dashboard-head">
@@ -23,7 +25,7 @@
     <label>Provinsi
       <select name="provinsi" class="filter-control">
         <option value="">Semua provinsi</option>
-        {% for item in provinsi_options %}<option value="{{ item.pk }}"{% if filters.provinsi == item.pk %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
+        {% for item in provinsi_options %}<option value="{{ item.kode }}"{% if filters.provinsi == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
       </select>
     </label>
     <label>Status sekolah
@@ -72,6 +74,11 @@
       <div class="card-heading">
         <div><h3>Sekolah per provinsi</h3><p class="muted">Jumlah sekolah pada setiap provinsi dengan filter yang dipilih.</p></div>
         <span class="card-tag">Nasional</span>
+      </div>
+      <div class="province-map-wrap">
+        <svg class="province-map" data-geojson-url="{% static 'data/indonesia-38-provinces.geojson' %}" data-aggregate-url="{% url 'core:home_aggregate' %}" role="group" aria-label="Peta jumlah sekolah per provinsi"></svg>
+        <p class="map-caption">Warna lebih gelap menunjukkan jumlah sekolah lebih banyak. Pilih provinsi untuk memfilter ringkasan.</p>
+        <p class="map-error" hidden>Peta belum dapat dimuat. Tabel jumlah sekolah per provinsi tetap tersedia di bawah.</p>
       </div>
       <div class="province-heading"><span>PROVINSI</span><span>SEKOLAH</span></div>
       {% for item in provinsi %}
