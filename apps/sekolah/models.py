@@ -47,6 +47,15 @@ class Sekolah(SoftDeleteModel):
     jumlah_guru = models.PositiveIntegerField("jumlah guru tetap", null=True, blank=True)
     # Kolom Excel yang belum punya kolom sendiri disimpan di sini (dipakai mesin impor).
     extra = models.JSONField("data tambahan", default=dict, blank=True, editable=False)
+    import_batch = models.ForeignKey(
+        "imports.ImportBatch",
+        verbose_name="batch impor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="sekolah",
+        editable=False,
+    )
 
     history = HistoricalRecords()
 

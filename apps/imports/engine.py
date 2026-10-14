@@ -165,6 +165,7 @@ def check_mapping(
         "deleted_at",
         "deleted_by",
         "extra",
+        "import_batch",
     }
     importable_fields = {
         model_field.name
@@ -212,7 +213,14 @@ def check_mapping(
     for model_field in spec.model._meta.fields:
         if model_field.auto_created:
             continue
-        if model_field.name in {"created_at", "updated_at", "deleted_at", "deleted_by", "extra"}:
+        if model_field.name in {
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "deleted_by",
+            "extra",
+            "import_batch",
+        }:
             continue
         if model_field.null or model_field.blank or model_field.has_default():
             continue
@@ -247,6 +255,13 @@ def run_dry_run(spec: DatasetSpec, table: Table, mapping: MappingConfig) -> Impo
     for f in spec.model._meta.fields:
         if f.choices:
             combined_aliases = dict(spec.default_aliases.get(f.name, {}))
+            try:
+                from apps.imports.models import ValueAlias
+
+                for va in ValueAlias.objects.filter(dataset_key=spec.key, field_name=f.name):
+                    combined_aliases[va.alias] = va.target_value
+            except Exception:
+                pass
             combined_aliases.update(mapping.value_maps.get(f.name, {}))
             choice_resolvers[f.name] = ChoiceResolver(f.flatchoices, combined_aliases)
 
@@ -441,6 +456,7 @@ def run_dry_run(spec: DatasetSpec, table: Table, mapping: MappingConfig) -> Impo
                     "deleted_at",
                     "deleted_by",
                     "extra",
+                    "import_batch",
                 }:
                     continue
                 if f.name in row_values:
