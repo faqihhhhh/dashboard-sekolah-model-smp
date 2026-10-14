@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Kebutuhan Intervensi{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Kebutuhan Intervensi</h1>
+      <p class="muted">Kendala yang dilaporkan dan dukungan yang dibutuhkan menurut workbook Profil Kondisi Awal Baseline.</p>
+    </div>
+    {% if can_view_detail %}<span class="card-tag">{{ category_count }} kategori pada pilihan ini</span>{% endif %}
+  </section>
+
+  <form method="get" class="dashboard-card intervention-filters" aria-label="Filter ringkasan kebutuhan">
+    <label>Kerangka program
+      <select class="filter-control" name="kerangka">
+        {% for value, label in frameworks %}<option value="{{ value }}"{% if framework == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Sasaran
+      <select class="filter-control" name="sasaran">
+        {% for value, label in targets %}<option value="{{ value }}"{% if target == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <button class="button-primary" type="submit">Terapkan</button>
+    <a class="button-outline" href="{% url 'intervensi:dashboard' %}">Reset</a>
+  </form>
+
+  {% if can_view_detail %}
+    <div class="intervention-source-note">
+      <strong>{{ framework_label }} · {{ target_label }}</strong>
+      <span>Persentase mengikuti nilai pada workbook. n menunjukkan jumlah responden untuk kelompok tingkat baseline; kelompok dengan jumlah kecil tetap mengikuti sumber.</span>
+    </div>
+    <div class="intervention-panels">
+      <section class="dashboard-card intervention-panel">
+        <div class="card-heading"><div><h2>Kendala</h2><p class="muted">Hal yang dilaporkan menghambat pelaksanaan.</p></div><span class="card-tag">{{ kendala|length }} kategori</span></div>
+        {% for category in kendala %}
+          <article class="intervention-category">
+            <h3>{{ category.name }}</h3>
+            <div class="intervention-values">
+              {% for value in category.values %}
+                <div class="intervention-value">
+                  <div class="intervention-value-heading"><span>{{ value.label }}</span><strong>{{ value.percent }}%</strong></div>
+                  <div class="intervention-track" role="img" aria-label="{{ value.percent }} persen; n sama dengan {{ value.sample_size }}"><span style="width: {{ value.bar_width }}%"></span></div>
+                  <small>n = {{ value.sample_size }}</small>
+                </div>
+              {% endfor %}
+            </div>
+          </article>
+        {% empty %}<p class="empty-state">Tidak ada kategori untuk pilihan ini pada workbook.</p>{% endfor %}
+      </section>
+
+      <section class="dashboard-card intervention-panel">
+        <div class="card-heading"><div><h2>Dukungan yang dibutuhkan</h2><p class="muted">Bentuk dukungan yang dipilih responden.</p></div><span class="card-tag">{{ dukungan|length }} kategori</span></div>
+        {% for category in dukungan %}
+          <article class="intervention-category">
+            <h3>{{ category.name }}</h3>
+            <div class="intervention-values">
+              {% for value in category.values %}
+                <div class="intervention-value">
+                  <div class="intervention-value-heading"><span>{{ value.label }}</span><strong>{{ value.percent }}%</strong></div>
+                  <div class="intervention-track" role="img" aria-label="{{ value.percent }} persen; n sama dengan {{ value.sample_size }}"><span style="width: {{ value.bar_width }}%"></span></div>
+                  <small>n = {{ value.sample_size }}</small>
+                </div>
+              {% endfor %}
+            </div>
+          </article>
+        {% empty %}<p class="empty-state">Tidak ada kategori untuk pilihan ini pada workbook.</p>{% endfor %}
+      </section>
+    </div>
+    <p class="intervention-footnote">Sumber: sheet <strong>Kendala</strong> dan <strong>Dukungan</strong> pada file Profil Kondisi Awal (Baseline)_SM_SMP.xlsx. Angka adalah agregat per kelompok baseline, bukan catatan kegiatan atau hasil intervensi.</p>
+  {% else %}
+    <section class="dashboard-card feature-notice" role="status">
+      <span class="feature-notice-icon" aria-hidden="true">i</span>
+      <div><strong>Ringkasan rinci tersedia bagi pengguna terdaftar</strong><p>Workbook memuat kelompok responden dengan jumlah yang kecil. Masuk sebagai Viewer atau lebih tinggi untuk melihat rincian kategori, persentase, dan jumlah responden.</p><a class="link" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Masuk</a></div>
+    </section>
+  {% endif %}
+{% endblock %}

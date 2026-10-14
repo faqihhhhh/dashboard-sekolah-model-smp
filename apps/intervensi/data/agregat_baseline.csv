@@ -1,0 +1,159 @@
+﻿jenis,kerangka,sasaran,kategori,tingkat,tingkat_label,jumlah_responden,proporsi,urutan
+kendala,pm,kepala_sekolah,Sulit memantau konsistensi penerapan Pembelajaran Mendalam pada setiap guru,pra_berkembang,Pra-Berkembang,3,1.0,1
+kendala,pm,kepala_sekolah,Sulit memantau konsistensi penerapan Pembelajaran Mendalam pada setiap guru,berkembang,Berkembang,46,0.739,1
+kendala,pm,kepala_sekolah,Sulit memantau konsistensi penerapan Pembelajaran Mendalam pada setiap guru,maju,Maju,27,0.704,1
+kendala,pm,kepala_sekolah,Sulit memantau konsistensi penerapan Pembelajaran Mendalam pada setiap guru,unggul,Unggul,2,0.5,1
+kendala,pm,kepala_sekolah,Pemahaman guru terkait Pembelajaran Mendalam masih rendah,pra_berkembang,Pra-Berkembang,3,0.6667,2
+kendala,pm,kepala_sekolah,Pemahaman guru terkait Pembelajaran Mendalam masih rendah,berkembang,Berkembang,46,0.717,2
+kendala,pm,kepala_sekolah,Pemahaman guru terkait Pembelajaran Mendalam masih rendah,maju,Maju,27,0.593,2
+kendala,pm,kepala_sekolah,Pemahaman guru terkait Pembelajaran Mendalam masih rendah,unggul,Unggul,2,0.0,2
+kendala,pm,kepala_sekolah,Belum ada instrumen supervisi yang sesuai untuk Pembelajaran Mendalam,pra_berkembang,Pra-Berkembang,3,0.6667,3
+kendala,pm,kepala_sekolah,Belum ada instrumen supervisi yang sesuai untuk Pembelajaran Mendalam,berkembang,Berkembang,46,0.543,3
+kendala,pm,kepala_sekolah,Belum ada instrumen supervisi yang sesuai untuk Pembelajaran Mendalam,maju,Maju,27,0.333,3
+kendala,pm,kepala_sekolah,Belum ada instrumen supervisi yang sesuai untuk Pembelajaran Mendalam,unggul,Unggul,2,0.5,3
+kendala,pm,kepala_sekolah,Keterbatasan mendampingi guru karena beban administrastif kepala sekolah,pra_berkembang,Pra-Berkembang,3,1.0,4
+kendala,pm,kepala_sekolah,Keterbatasan mendampingi guru karena beban administrastif kepala sekolah,berkembang,Berkembang,46,0.457,4
+kendala,pm,kepala_sekolah,Keterbatasan mendampingi guru karena beban administrastif kepala sekolah,maju,Maju,27,0.481,4
+kendala,pm,kepala_sekolah,Keterbatasan mendampingi guru karena beban administrastif kepala sekolah,unggul,Unggul,2,0.5,4
+kendala,pm,kepala_sekolah,Guru belum mau melakukan perubahan pendekatan pembelajaran,pra_berkembang,Pra-Berkembang,3,0.6667,5
+kendala,pm,kepala_sekolah,Guru belum mau melakukan perubahan pendekatan pembelajaran,berkembang,Berkembang,46,0.348,5
+kendala,pm,kepala_sekolah,Guru belum mau melakukan perubahan pendekatan pembelajaran,maju,Maju,27,0.148,5
+kendala,pm,kepala_sekolah,Guru belum mau melakukan perubahan pendekatan pembelajaran,unggul,Unggul,2,0.0,5
+kendala,pm,guru,Belum memahami konsep Pembelajaran Mendalam secara utuh,pra_berkembang,Pra-Berkembang,42,0.69,1
+kendala,pm,guru,Belum memahami konsep Pembelajaran Mendalam secara utuh,berkembang,Berkembang,624,0.601,1
+kendala,pm,guru,Belum memahami konsep Pembelajaran Mendalam secara utuh,maju,Maju,446,0.547,1
+kendala,pm,guru,Belum memahami konsep Pembelajaran Mendalam secara utuh,unggul,Unggul,35,0.4,1
+kendala,pm,guru,Kesulitan merancang aktivitas yang sesuai dengan Pembelajaran Mendalam,pra_berkembang,Pra-Berkembang,42,0.381,2
+kendala,pm,guru,Kesulitan merancang aktivitas yang sesuai dengan Pembelajaran Mendalam,berkembang,Berkembang,624,0.431,2
+kendala,pm,guru,Kesulitan merancang aktivitas yang sesuai dengan Pembelajaran Mendalam,maju,Maju,446,0.453,2
+kendala,pm,guru,Kesulitan merancang aktivitas yang sesuai dengan Pembelajaran Mendalam,unggul,Unggul,35,0.686,2
+kendala,pm,guru,"Kurangnya sarana pendukung pembelajaran (perangkat digital, internet)",pra_berkembang,Pra-Berkembang,42,0.429,3
+kendala,pm,guru,"Kurangnya sarana pendukung pembelajaran (perangkat digital, internet)",berkembang,Berkembang,624,0.301,3
+kendala,pm,guru,"Kurangnya sarana pendukung pembelajaran (perangkat digital, internet)",maju,Maju,446,0.276,3
+kendala,pm,guru,"Kurangnya sarana pendukung pembelajaran (perangkat digital, internet)",unggul,Unggul,35,0.2,3
+kendala,pm,guru,Murid belum terbiasa dengan pembelajaran yang menuntut keterlibatan aktif,pra_berkembang,Pra-Berkembang,42,0.524,4
+kendala,pm,guru,Murid belum terbiasa dengan pembelajaran yang menuntut keterlibatan aktif,berkembang,Berkembang,624,0.527,4
+kendala,pm,guru,Murid belum terbiasa dengan pembelajaran yang menuntut keterlibatan aktif,maju,Maju,446,0.534,4
+kendala,pm,guru,Murid belum terbiasa dengan pembelajaran yang menuntut keterlibatan aktif,unggul,Unggul,35,0.486,4
+kendala,pm,guru,Terbatasnya ketersediaan contoh modul ajar yang sesuai,pra_berkembang,Pra-Berkembang,42,0.667,5
+kendala,pm,guru,Terbatasnya ketersediaan contoh modul ajar yang sesuai,berkembang,Berkembang,624,0.609,5
+kendala,pm,guru,Terbatasnya ketersediaan contoh modul ajar yang sesuai,maju,Maju,446,0.637,5
+kendala,pm,guru,Terbatasnya ketersediaan contoh modul ajar yang sesuai,unggul,Unggul,35,0.743,5
+kendala,pm,guru,Tidak ada pendampingan dari kepala sekolah atau pengawas,pra_berkembang,Pra-Berkembang,42,0.214,6
+kendala,pm,guru,Tidak ada pendampingan dari kepala sekolah atau pengawas,berkembang,Berkembang,624,0.12,6
+kendala,pm,guru,Tidak ada pendampingan dari kepala sekolah atau pengawas,maju,Maju,446,0.168,6
+kendala,pm,guru,Tidak ada pendampingan dari kepala sekolah atau pengawas,unggul,Unggul,35,0.314,6
+kendala,pm,guru,Tidak ada rubrik atau instrumen penilaian yang memadai,pra_berkembang,Pra-Berkembang,42,0.071,7
+kendala,pm,guru,Tidak ada rubrik atau instrumen penilaian yang memadai,berkembang,Berkembang,624,0.051,7
+kendala,pm,guru,Tidak ada rubrik atau instrumen penilaian yang memadai,maju,Maju,446,0.038,7
+kendala,pm,guru,Tidak ada rubrik atau instrumen penilaian yang memadai,unggul,Unggul,35,0.029,7
+kendala,kka,kepala_sekolah,Pelatihan yang sudah diikuti guru belum cukup untuk diterapkan langsung di kelas,pra_berkembang,Pra-Berkembang,24,0.667,1
+kendala,kka,kepala_sekolah,Pelatihan yang sudah diikuti guru belum cukup untuk diterapkan langsung di kelas,berkembang,Berkembang,38,0.947,1
+kendala,kka,kepala_sekolah,Belum ada instrumen supervisi yang sesuai untuk pembelajaran Koding dan KA,pra_berkembang,Pra-Berkembang,24,0.583,2
+kendala,kka,kepala_sekolah,Belum ada instrumen supervisi yang sesuai untuk pembelajaran Koding dan KA,berkembang,Berkembang,38,0.763,2
+kendala,kka,kepala_sekolah,Guru belum memiliki kompetensi dasar di bidang Koding atau KA,pra_berkembang,Pra-Berkembang,24,0.458,3
+kendala,kka,kepala_sekolah,Guru belum memiliki kompetensi dasar di bidang Koding atau KA,berkembang,Berkembang,38,0.553,3
+kendala,kka,kepala_sekolah,Tidak ada perangkat ajar atau modul Koding dan KA yang memadai,pra_berkembang,Pra-Berkembang,24,0.833,4
+kendala,kka,kepala_sekolah,Tidak ada perangkat ajar atau modul Koding dan KA yang memadai,berkembang,Berkembang,38,0.474,4
+kendala,kka,kepala_sekolah,"Fasilitas sekolah (komputer, jaringan internet) tidak memadai untuk pembelajaran Koding dan KA",pra_berkembang,Pra-Berkembang,24,0.458,5
+kendala,kka,kepala_sekolah,"Fasilitas sekolah (komputer, jaringan internet) tidak memadai untuk pembelajaran Koding dan KA",berkembang,Berkembang,38,0.553,5
+kendala,kka,kepala_sekolah,Beban administratif menyita waktu saya untuk mendampingi guru,pra_berkembang,Pra-Berkembang,24,0.333,6
+kendala,kka,kepala_sekolah,Beban administratif menyita waktu saya untuk mendampingi guru,berkembang,Berkembang,38,0.263,6
+kendala,kka,guru,Murid belum memiliki kesiapan dasar untuk mengikuti pembelajaran Koding dan KA,pra_berkembang,Pra-Berkembang,66,0.5152,1
+kendala,kka,guru,Murid belum memiliki kesiapan dasar untuk mengikuti pembelajaran Koding dan KA,berkembang,Berkembang,82,0.5,1
+kendala,kka,guru,Kesulitan merancang aktivitas pembelajaran Koding dan KA yang sesuai usia murid,pra_berkembang,Pra-Berkembang,66,0.5455,2
+kendala,kka,guru,Kesulitan merancang aktivitas pembelajaran Koding dan KA yang sesuai usia murid,berkembang,Berkembang,82,0.5244,2
+kendala,kka,guru,Tidak tersedia modul atau perangkat ajar Koding dan KA yang memadai,pra_berkembang,Pra-Berkembang,66,0.4242,3
+kendala,kka,guru,Tidak tersedia modul atau perangkat ajar Koding dan KA yang memadai,berkembang,Berkembang,82,0.4024,3
+kendala,kka,guru,Pelatihan yang sudah saya ikuti belum cukup untuk diterapkan langsung di kelas,pra_berkembang,Pra-Berkembang,66,0.5,4
+kendala,kka,guru,Pelatihan yang sudah saya ikuti belum cukup untuk diterapkan langsung di kelas,berkembang,Berkembang,82,0.4146,4
+kendala,kka,guru,"Fasilitas sekolah (komputer, jaringan internet) tidak memadai",pra_berkembang,Pra-Berkembang,66,0.3333,5
+kendala,kka,guru,"Fasilitas sekolah (komputer, jaringan internet) tidak memadai",berkembang,Berkembang,82,0.3659,5
+kendala,kka,guru,Tidak ada pendampingan dari kepala sekolah atau pengawas dalam penerapan Koding dan KA,pra_berkembang,Pra-Berkembang,66,0.1667,6
+kendala,kka,guru,Tidak ada pendampingan dari kepala sekolah atau pengawas dalam penerapan Koding dan KA,berkembang,Berkembang,82,0.0488,6
+kendala,kka,guru,Pembelajaran Koding dan KA bukan bidang keahlian saya,pra_berkembang,Pra-Berkembang,66,0.4242,7
+kendala,kka,guru,Pembelajaran Koding dan KA bukan bidang keahlian saya,berkembang,Berkembang,82,0.3659,7
+dukungan,pm,kepala_sekolah,Pelatihan dan pendampingan berkelanjutan,pra_berkembang,Pra-Berkembang,5,1.0,1
+dukungan,pm,kepala_sekolah,Pelatihan dan pendampingan berkelanjutan,berkembang,Berkembang,96,0.927,1
+dukungan,pm,kepala_sekolah,Pelatihan dan pendampingan berkelanjutan,maju,Maju,76,0.947,1
+dukungan,pm,kepala_sekolah,Pelatihan dan pendampingan berkelanjutan,unggul,Unggul,7,1.0,1
+dukungan,pm,kepala_sekolah,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",pra_berkembang,Pra-Berkembang,5,0.6,2
+dukungan,pm,kepala_sekolah,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",berkembang,Berkembang,96,0.5,2
+dukungan,pm,kepala_sekolah,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",maju,Maju,76,0.395,2
+dukungan,pm,kepala_sekolah,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",unggul,Unggul,7,0.714,2
+dukungan,pm,kepala_sekolah,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",pra_berkembang,Pra-Berkembang,5,0.2,3
+dukungan,pm,kepala_sekolah,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",berkembang,Berkembang,96,0.333,3
+dukungan,pm,kepala_sekolah,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",maju,Maju,76,0.395,3
+dukungan,pm,kepala_sekolah,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",unggul,Unggul,7,0.429,3
+dukungan,pm,kepala_sekolah,Wadah belajar bersama antarguru,pra_berkembang,Pra-Berkembang,5,0.0,4
+dukungan,pm,kepala_sekolah,Wadah belajar bersama antarguru,berkembang,Berkembang,96,0.333,4
+dukungan,pm,kepala_sekolah,Wadah belajar bersama antarguru,maju,Maju,76,0.395,4
+dukungan,pm,kepala_sekolah,Wadah belajar bersama antarguru,unggul,Unggul,7,0.571,4
+dukungan,pm,kepala_sekolah,Fasilitasi kemitraan/jejaring (showcasing),pra_berkembang,Pra-Berkembang,5,0.6,5
+dukungan,pm,kepala_sekolah,Fasilitasi kemitraan/jejaring (showcasing),berkembang,Berkembang,96,0.26,5
+dukungan,pm,kepala_sekolah,Fasilitasi kemitraan/jejaring (showcasing),maju,Maju,76,0.368,5
+dukungan,pm,kepala_sekolah,Fasilitasi kemitraan/jejaring (showcasing),unggul,Unggul,7,0.143,5
+dukungan,pm,kepala_sekolah,Perangkat atau media pembelajaran,pra_berkembang,Pra-Berkembang,5,0.2,6
+dukungan,pm,kepala_sekolah,Perangkat atau media pembelajaran,berkembang,Berkembang,96,0.333,6
+dukungan,pm,kepala_sekolah,Perangkat atau media pembelajaran,maju,Maju,76,0.395,6
+dukungan,pm,kepala_sekolah,Perangkat atau media pembelajaran,unggul,Unggul,7,0.429,6
+dukungan,pm,kepala_sekolah,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),pra_berkembang,Pra-Berkembang,5,0.2,7
+dukungan,pm,kepala_sekolah,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),berkembang,Berkembang,96,0.302,7
+dukungan,pm,kepala_sekolah,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),maju,Maju,76,0.224,7
+dukungan,pm,kepala_sekolah,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),unggul,Unggul,7,0.0,7
+dukungan,pm,guru,Pelatihan dan pendampingan berkelanjutan,pra_berkembang,Pra-Berkembang,97,0.794,1
+dukungan,pm,guru,Pelatihan dan pendampingan berkelanjutan,berkembang,Berkembang,1687,0.791,1
+dukungan,pm,guru,Pelatihan dan pendampingan berkelanjutan,maju,Maju,1480,0.801,1
+dukungan,pm,guru,Pelatihan dan pendampingan berkelanjutan,unggul,Unggul,120,0.875,1
+dukungan,pm,guru,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",pra_berkembang,Pra-Berkembang,97,0.598,2
+dukungan,pm,guru,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",berkembang,Berkembang,1687,0.324,2
+dukungan,pm,guru,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",maju,Maju,1480,0.289,2
+dukungan,pm,guru,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",unggul,Unggul,120,0.32,2
+dukungan,pm,guru,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",pra_berkembang,Pra-Berkembang,97,0.588,3
+dukungan,pm,guru,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",berkembang,Berkembang,1687,0.348,3
+dukungan,pm,guru,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",maju,Maju,1480,0.376,3
+dukungan,pm,guru,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",unggul,Unggul,120,0.188,3
+dukungan,pm,guru,Wadah belajar bersama antarguru,pra_berkembang,Pra-Berkembang,97,0.268,4
+dukungan,pm,guru,Wadah belajar bersama antarguru,berkembang,Berkembang,1687,0.666,4
+dukungan,pm,guru,Wadah belajar bersama antarguru,maju,Maju,1480,0.617,4
+dukungan,pm,guru,Wadah belajar bersama antarguru,unggul,Unggul,120,0.523,4
+dukungan,pm,guru,Perangkat atau media pembelajaran,pra_berkembang,Pra-Berkembang,97,0.412,5
+dukungan,pm,guru,Perangkat atau media pembelajaran,berkembang,Berkembang,1687,0.538,5
+dukungan,pm,guru,Perangkat atau media pembelajaran,maju,Maju,1480,0.526,5
+dukungan,pm,guru,Perangkat atau media pembelajaran,unggul,Unggul,120,0.586,5
+dukungan,pm,guru,Fasilitasi kemitraan/jejaring (showcasing),pra_berkembang,Pra-Berkembang,97,0.134,6
+dukungan,pm,guru,Fasilitasi kemitraan/jejaring (showcasing),berkembang,Berkembang,1687,0.146,6
+dukungan,pm,guru,Fasilitasi kemitraan/jejaring (showcasing),maju,Maju,1480,0.193,6
+dukungan,pm,guru,Fasilitasi kemitraan/jejaring (showcasing),unggul,Unggul,120,0.125,6
+dukungan,pm,guru,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),pra_berkembang,Pra-Berkembang,97,0.206,7
+dukungan,pm,guru,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),berkembang,Berkembang,1687,0.187,7
+dukungan,pm,guru,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),maju,Maju,1480,0.199,7
+dukungan,pm,guru,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),unggul,Unggul,120,0.383,7
+dukungan,kka,kepala_sekolah,Pelatihan dan pendampingan berkelanjutan,pra_berkembang,Pra-Berkembang,41,0.976,1
+dukungan,kka,kepala_sekolah,Pelatihan dan pendampingan berkelanjutan,berkembang,Berkembang,85,0.929,1
+dukungan,kka,kepala_sekolah,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",pra_berkembang,Pra-Berkembang,41,0.707,2
+dukungan,kka,kepala_sekolah,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",berkembang,Berkembang,85,0.6,2
+dukungan,kka,kepala_sekolah,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",pra_berkembang,Pra-Berkembang,41,0.512,3
+dukungan,kka,kepala_sekolah,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",berkembang,Berkembang,85,0.306,3
+dukungan,kka,kepala_sekolah,Perangkat atau media pembelajaran,pra_berkembang,Pra-Berkembang,41,0.293,4
+dukungan,kka,kepala_sekolah,Perangkat atau media pembelajaran,berkembang,Berkembang,85,0.388,4
+dukungan,kka,kepala_sekolah,Fasilitasi kemitraan/jejaring (showcasing),pra_berkembang,Pra-Berkembang,41,0.244,5
+dukungan,kka,kepala_sekolah,Fasilitasi kemitraan/jejaring (showcasing),berkembang,Berkembang,85,0.282,5
+dukungan,kka,kepala_sekolah,Wadah belajar bersama antarguru,pra_berkembang,Pra-Berkembang,41,0.098,6
+dukungan,kka,kepala_sekolah,Wadah belajar bersama antarguru,berkembang,Berkembang,85,0.235,6
+dukungan,kka,kepala_sekolah,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),pra_berkembang,Pra-Berkembang,41,0.171,7
+dukungan,kka,kepala_sekolah,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),berkembang,Berkembang,85,0.259,7
+dukungan,kka,guru,Pelatihan dan pendampingan berkelanjutan,pra_berkembang,Pra-Berkembang,100,0.86,1
+dukungan,kka,guru,Pelatihan dan pendampingan berkelanjutan,berkembang,Berkembang,214,0.785,1
+dukungan,kka,guru,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",pra_berkembang,Pra-Berkembang,100,0.64,2
+dukungan,kka,guru,"Sumber belajar (buku, panduan, modul, video pembelajaran, dan referensi lain)",berkembang,Berkembang,214,0.715,2
+dukungan,kka,guru,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",pra_berkembang,Pra-Berkembang,100,0.52,3
+dukungan,kka,guru,"Sarana pendukung pembelajaran (internet, perangkat digital, dll)",berkembang,Berkembang,214,0.6075,3
+dukungan,kka,guru,Perangkat atau media pembelajaran,pra_berkembang,Pra-Berkembang,100,0.35,4
+dukungan,kka,guru,Perangkat atau media pembelajaran,berkembang,Berkembang,214,0.3598,4
+dukungan,kka,guru,Wadah belajar bersama antarguru,pra_berkembang,Pra-Berkembang,100,0.3,5
+dukungan,kka,guru,Wadah belajar bersama antarguru,berkembang,Berkembang,214,0.2383,5
+dukungan,kka,guru,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),pra_berkembang,Pra-Berkembang,100,0.24,6
+dukungan,kka,guru,Wadah atau kanal untuk konsultasi (pusat bantuan/helpdesk),berkembang,Berkembang,214,0.1729,6
+dukungan,kka,guru,Fasilitasi kemitraan/jejaring (showcasing),pra_berkembang,Pra-Berkembang,100,0.09,7
+dukungan,kka,guru,Fasilitasi kemitraan/jejaring (showcasing),berkembang,Berkembang,214,0.1215,7

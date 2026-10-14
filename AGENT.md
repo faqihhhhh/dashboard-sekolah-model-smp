@@ -184,6 +184,8 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Empat ringkasan kelengkapan dan grafik kumulatif berdasarkan waktu pencatatan aplikasi
   - [ ] Verifikasi tampilan melalui browser dan operasional unggah/penyajian PDF di lingkungan Docker (belum dijalankan di sesi ini)
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif
+  - [x] Tahap referensi kebutuhan: agregat `Kendala` dan `Dukungan` diekstrak dari workbook baseline; halaman dapat difilter berdasarkan PM/KKA dan sasaran, Guest tidak menerima rincian per kelompok
+  - [ ] Modul kegiatan operasional belum dibangun: workbook ini tidak menyediakan penyelenggara, pelaksana, tanggal, status, target, maupun realisasi intervensi
 - [ ] **Fase 7 — Hardening dan deploy final** — rate limit login, header keamanan, audit dependensi, cadangan + uji restore, domain/HTTPS, README/runbook/panduan Admin, UAT
 - [ ] **Fase 8 — Setelah rilis** — Kurasi & RTL (butuh spesifikasi), ekspor, edit massal, MFA, analitik/prediksi (peran DB read-only, pandas; baru bermakna setelah beberapa periode)
 - [ ] **Backlog** — README, CI GitHub Actions (lint + tes + Postgres), halaman 404/500, halaman ubah kata sandi sendiri, aturan hapus Periode, aksesibilitas
@@ -202,5 +204,6 @@ Tanyakan bila terhalang; jangan mengarang kebutuhan.
 4. Status intervensi: eksplisit atau diturunkan dari tanggal realisasi? (saran: eksplisit + validasi)
 5. Apakah agregat publik perlu menyembunyikan kelompok yang sangat kecil?
 6. Contoh file intervensi dan surat dukungan (kolom dan format).
+   - Workbook baseline yang tersedia hanya memberi agregat kendala/dukungan; spesifikasi catatan kegiatan tetap diperlukan untuk modul operasional Fase 6.
 7. Tanggal sebenarnya Periode Baseline.
 8. Domain dan hosting akhir.

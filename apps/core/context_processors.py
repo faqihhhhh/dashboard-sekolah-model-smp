@@ -29,6 +29,7 @@ NAV = [
     (
         "Intervensi",
         [
+            NavItem("Kebutuhan Intervensi", "intervensi:dashboard"),
             NavItem("Direktorat SMP"),
             NavItem("BBPMP/BPMP"),
             NavItem("Dinas Pendidikan"),
