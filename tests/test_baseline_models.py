@@ -6,7 +6,11 @@ from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import IntegrityError, transaction
 
-from apps.baseline.importing import transform_indicator_values
+from apps.baseline.importing import (
+    BaselineMapping,
+    run_baseline_dry_run,
+    transform_indicator_values,
+)
 from apps.baseline.models import (
     HasilBaseline,
     HasilIndikator,
@@ -16,6 +20,7 @@ from apps.baseline.models import (
     PanduanRating,
     RatingIndikator,
 )
+from apps.imports.readers import Table
 from apps.referensi.models import Periode
 
 pytestmark = pytest.mark.django_db
@@ -188,3 +193,117 @@ def test_transformasi_rating_menolak_pemetaan_ganda():
 
     assert not transformed.ok
     assert len(transformed.mapping_errors) == 1
+
+
+def test_dry_run_baseline_valid_tidak_menulis_data(make_sekolah):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Dry Run", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+    table = Table(
+        name="SMP",
+        rows=[
+            ["NPSN", "Skor PM", "Profil PM", "Kondisi", "PM | 1.1.1"],
+            [school.npsn, "2.3552083333", "Berkembang", "Tersedia", "Maju"],
+        ],
+        n_cols=5,
+    )
+    mapping = BaselineMapping(
+        npsn_header="NPSN",
+        summary_columns={"skor_pm": "Skor PM", "profil_pm": "Profil PM"},
+        profile_columns={"Kondisi": "kondisi"},
+        indicator_columns={"PM | 1.1.1": indicator},
+    )
+
+    preview = run_baseline_dry_run(table, periode=period, mapping=mapping)
+
+    assert preview.ok
+    assert preview.counts() == {"create": 1, "update": 0, "unchanged": 0, "error": 0}
+    assert preview.rows[0].school == school
+    assert preview.rows[0].values["skor_pm"] == Decimal("2.3552083333")
+    assert preview.rows[0].values["profil_pm"] == "Berkembang"
+    assert preview.rows[0].indicators[0].rating == RatingIndikator.MAJU
+    assert HasilBaseline.objects.count() == 0
+    assert HasilIndikator.objects.count() == 0
+
+
+def test_dry_run_baseline_melaporkan_npsn_ganda_dan_rating_tidak_dikenal(make_sekolah):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Validasi", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+    table = Table(
+        name="SMP",
+        rows=[
+            ["NPSN", "PM | 1.1.1"],
+            [school.npsn, "Rating baru"],
+            [school.npsn, "Maju"],
+        ],
+        n_cols=2,
+    )
+
+    preview = run_baseline_dry_run(
+        table,
+        periode=period,
+        mapping=BaselineMapping(npsn_header="NPSN", indicator_columns={"PM | 1.1.1": indicator}),
+    )
+
+    assert not preview.ok
+    assert preview.counts()["error"] == 2
+    assert len(preview.rows[0].issues) == 1
+    assert len(preview.rows[1].issues) == 1
+
+
+def test_dry_run_baseline_mengabaikan_kolom_kosong_saat_pembaruan(make_sekolah):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Tidak Menimpa Kosong", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+    baseline = HasilBaseline.objects.create(
+        sekolah=school,
+        periode=period,
+        skor_pm=Decimal("2.5"),
+        profil_data={"kondisi": "Tersedia"},
+    )
+    HasilIndikator.objects.create(
+        hasil_baseline=baseline, indikator=indicator, rating=RatingIndikator.MAJU
+    )
+    table = Table(
+        name="SMP",
+        rows=[["NPSN", "Skor PM", "Kondisi", "PM | 1.1.1"], [school.npsn, None, None, None]],
+        n_cols=4,
+    )
+
+    preview = run_baseline_dry_run(
+        table,
+        periode=period,
+        mapping=BaselineMapping(
+            npsn_header="NPSN",
+            summary_columns={"skor_pm": "Skor PM"},
+            profile_columns={"Kondisi": "kondisi"},
+            indicator_columns={"PM | 1.1.1": indicator},
+        ),
+    )
+
+    assert preview.ok
+    assert preview.counts()["unchanged"] == 1
+    assert preview.rows[0].values == {}
+    assert preview.rows[0].indicators == []
