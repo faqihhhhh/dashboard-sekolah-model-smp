@@ -1,0 +1,24 @@
+{% if chart.empty %}
+  <p class="muted">Belum ada skor numerik untuk divisualisasikan.</p>
+{% else %}
+  <figure class="trend-chart">
+    <svg viewBox="0 0 100 118" role="img" aria-label="Grafik perkembangan skor berdasarkan periode" preserveAspectRatio="none">
+      <path class="trend-gridline" d="M0 10H100 M0 50H100 M0 90H100" />
+      {% for line in chart.lines %}
+        {% if line.points %}
+          <polyline fill="none" stroke="{{ line.color }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" points="{% for point in line.points %}{% if not forloop.first %} {% endif %}{{ point.x }},{{ point.y }}{% endfor %}" />
+          {% for point in line.points %}<circle cx="{{ point.x }}" cy="{{ point.y }}" r="1.8" fill="{{ line.color }}" />{% endfor %}
+        {% endif %}
+      {% endfor %}
+      {% for label in chart.labels %}<text x="{{ label.x }}" y="114">{{ label.label }}</text>{% endfor %}
+    </svg>
+    <ul class="trend-legend">
+      {% for line in chart.lines %}<li><span style="background:{{ line.color }}"></span>{{ line.name }}</li>{% endfor %}
+    </ul>
+    <div class="trend-values">
+      {% for line in chart.lines %}
+        <section><h3>{{ line.name }}</h3><ul>{% for point in line.points %}<li>{{ point.label }} <strong>{{ point.value }}</strong></li>{% empty %}<li>Belum ada nilai</li>{% endfor %}</ul></section>
+      {% endfor %}
+    </div>
+  </figure>
+{% endif %}

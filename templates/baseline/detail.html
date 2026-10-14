@@ -18,6 +18,11 @@
     </dl></section>
   {% endif %}
 
+  <section class="dashboard-card trend-card">
+    <div><h2>Perkembangan skor per periode</h2><p class="muted">Skor ditampilkan sesuai nilai sumber yang tersimpan.</p></div>
+    {% include "components/trend_chart.html" with chart=trend %}
+  </section>
+
   <section class="dashboard-card indicator-detail-card">
     <div class="card-heading"><div><h2>Rating indikator Level 3</h2><p class="muted">Uraian rubrik tersedia di Panduan Indikator.</p></div><a href="{% url 'baseline:guide' %}" class="button-outline">Buka panduan</a></div>
     {% if is_admin %}<form method="post" class="import-form">{% csrf_token %}{% endif %}

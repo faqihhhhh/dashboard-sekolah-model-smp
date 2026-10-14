@@ -164,7 +164,7 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] 2.2 model `ImportBatch`, `MappingProfile`, `ValueAlias`; FK `import_batch` pada model yang diimpor; commit transaksional; rollback
   - [x] 2.3 wizard UI (HTMX): unggah → sheet/header → pemetaan kolom (aksi massal) → profil → pemetaan nilai → dry-run → mode/konflik → simpan
   - [x] 2.4 laporan error `.xlsx`, riwayat batch, unduh file asli, tombol rollback
-- [ ] **Fase 3 — Baseline** — `HasilBaseline`, `KamusIndikator`, `HasilIndikator` (format panjang); impor lebar→panjang; donut PM/KKA; Panduan Indikator;
+- [x] **Fase 3 — Baseline** — `HasilBaseline`, `KamusIndikator`, `HasilIndikator` (format panjang); impor lebar→panjang; donut PM/KKA; Panduan Indikator;
   detail sekolah + edit indikator; **komponen chart perkembangan generik** (dataset ber-`time_field`)
   - [x] Model baseline dan relasi hierarki kamus indikator; skor tersimpan dengan presisi sumber
   - [x] Kamus indikator dan panduan rating PM/KKA diekstrak dari workbook sumber; perintah `seed_baseline_reference` aman dijalankan ulang
@@ -174,7 +174,7 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Wizard Admin unggah → pilih sheet/header → pemetaan manual → dry-run → alias rating → commit; batch muncul di riwayat impor
   - [x] Dashboard agregat dan donut PM/KKA; Guest tidak menerima data sekolah
   - [x] Panduan indikator publik; detail hasil untuk Viewer+; edit rating ber-riwayat untuk Admin+
-  - [ ] Komponen chart perkembangan generik lintas periode
+  - [x] Komponen SVG perkembangan generik berdasarkan field waktu; detail sekolah menampilkan tren skor lintas periode
 - [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
 - [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif

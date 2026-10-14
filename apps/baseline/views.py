@@ -17,6 +17,7 @@ from django.views.decorators.http import require_http_methods
 
 from apps.accounts.models import Role
 from apps.accounts.permissions import has_role
+from apps.core.trends import build_time_chart
 from apps.imports.readers import (
     DELIMITERS,
     ENCODINGS,
@@ -468,6 +469,14 @@ def detail(request, pk):
     if not has_role(request.user, Role.VIEWER):
         raise PermissionDenied
     baseline = get_object_or_404(HasilBaseline.objects.select_related("sekolah", "periode"), pk=pk)
+    trend = build_time_chart(
+        HasilBaseline.objects.filter(sekolah=baseline.sekolah).select_related("periode"),
+        time_field="periode",
+        value_fields=(
+            ("skor_pm", "Skor PM", "#2563eb"),
+            ("skor_kka", "Skor KKA", "#059669"),
+        ),
+    )
     is_admin = has_role(request.user, Role.ADMIN)
     indicators = list(
         KamusIndikator.objects.filter(aktif=True, level=LevelIndikator.L3)
@@ -553,5 +562,6 @@ def detail(request, pk):
             "rows": rows,
             "is_admin": is_admin,
             "rating_choices": RatingIndikator.choices,
+            "trend": trend,
         },
     )
