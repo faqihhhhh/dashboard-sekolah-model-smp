@@ -168,7 +168,8 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   detail sekolah + edit indikator; **komponen chart perkembangan generik** (dataset ber-`time_field`)
   - [x] Model baseline dan relasi hierarki kamus indikator; skor tersimpan dengan presisi sumber
   - [x] Kamus indikator dan panduan rating PM/KKA diekstrak dari workbook sumber; perintah `seed_baseline_reference` aman dijalankan ulang
-  - [ ] Impor baseline lebar→panjang dan validasi/dry-run
+  - [x] Transformasi rating lebar→panjang dengan pemetaan kolom eksplisit; sel kosong tidak menimpa nilai
+  - [ ] Dry-run baseline, validasi sekolah/periode, lalu commit dan rollback satu batch
   - [ ] UI panduan, detail/edit indikator, donut PM/KKA, dan chart perkembangan generik
 - [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
 - [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif

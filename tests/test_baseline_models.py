@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import IntegrityError, transaction
 
+from apps.baseline.importing import transform_indicator_values
 from apps.baseline.models import (
     HasilBaseline,
     HasilIndikator,
@@ -134,3 +135,56 @@ def test_seed_baseline_reference_idempoten():
     call_command("seed_baseline_reference", verbosity=0)
     assert KamusIndikator.objects.count() == 56
     assert PanduanRating.objects.count() == 136
+
+
+def test_transformasi_rating_lebar_ke_panjang_mengabaikan_kosong():
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+
+    transformed = transform_indicator_values(
+        {"PM | 1.1.1": "Pra- Berkembang", "PM | 1.1.2": "#N/A"},
+        {"PM | 1.1.1": indicator},
+    )
+
+    assert transformed.ok
+    assert len(transformed.values) == 1
+    assert transformed.values[0].indikator == indicator
+    assert transformed.values[0].rating == RatingIndikator.PRA_BERKEMBANG
+
+
+def test_transformasi_rating_melaporkan_nilai_tidak_dikenal():
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.KKA,
+        level=LevelIndikator.L3,
+        kode="2.1.1",
+        nama="Contoh indikator",
+    )
+
+    transformed = transform_indicator_values(
+        {"KKA | 2.1.1": "Kategori baru"}, {"KKA | 2.1.1": indicator}
+    )
+
+    assert not transformed.ok
+    assert transformed.values == []
+    assert len(transformed.issues) == 1
+
+
+def test_transformasi_rating_menolak_pemetaan_ganda():
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Contoh indikator",
+    )
+
+    transformed = transform_indicator_values(
+        {"PM | 1.1.1": "Maju", "Salinan": "Maju"},
+        {"PM | 1.1.1": indicator, "Salinan": indicator},
+    )
+
+    assert not transformed.ok
+    assert len(transformed.mapping_errors) == 1
