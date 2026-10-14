@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}Impor Baseline{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Impor Baseline Sekolah</h1>
+      <p class="muted">Pilih periode dan petakan setiap kolom secara manual. File diuji lebih dahulu; data hanya disimpan setelah konfirmasi.</p>
+    </div>
+    <a href="{% url 'imports:history' %}" class="button-outline">Riwayat impor</a>
+  </section>
+
+  <nav class="import-steps" aria-label="Tahapan impor">
+    {% for key, label in steps %}
+      <span class="import-step{% if forloop.counter0 == step_index %} active{% elif forloop.counter0 < step_index %} complete{% endif %}">
+        <span>{{ forloop.counter }}</span>{{ label }}
+      </span>
+    {% endfor %}
+  </nav>
+  {% if error %}<div class="message message-error" role="alert">{{ error }}</div>{% endif %}
+
+  {% if stage == "upload" %}
+    <section class="dashboard-card import-panel">
+      <h2>1. Unggah file</h2>
+      <p class="muted">Mendukung .xlsx dan .csv hingga 20 MB. File sumber disimpan privat sebagai bagian dari batch.</p>
+      <form method="post" enctype="multipart/form-data" class="import-form">
+        {% csrf_token %}<input type="hidden" name="action" value="upload">
+        <label class="field-label" for="baseline-file">File baseline</label>
+        <input id="baseline-file" type="file" name="file" accept=".xlsx,.csv" required class="file-control">
+        <div class="import-options">
+          <label>Encoding CSV
+            <select name="encoding" class="filter-control"><option value="">Pilih encoding</option>
+              {% for value in encodings %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+            </select>
+          </label>
+          <label>Pemisah CSV
+            <select name="delimiter" class="filter-control"><option value="">Pilih pemisah</option>
+              {% for value, label in delimiters %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </label>
+        </div>
+        <button class="button-primary" type="submit">Lanjutkan</button>
+      </form>
+    </section>
+
+  {% elif stage == "headers" %}
+    <section class="dashboard-card import-panel">
+      <h2>2. Pilih sheet dan baris header</h2>
+      <p class="muted">File: <strong>{{ state.filename }}</strong>. Workbook baseline biasanya memakai dua baris header dan data mulai baris 3.</p>
+      <form method="post" class="import-form">
+        {% csrf_token %}<input type="hidden" name="action" value="headers">
+        {% if state.suffix == ".xlsx" %}
+          <label>Sheet
+            <select name="sheet" class="filter-control" required><option value="">Pilih sheet</option>
+              {% for sheet in sheets %}<option value="{{ sheet }}">{{ sheet }}</option>{% endfor %}
+            </select>
+          </label>
+        {% else %}<input type="hidden" name="sheet" value="CSV">{% endif %}
+        <div class="import-options">
+          <label>Baris header<input name="header_rows" value="1,2" class="filter-control" required></label>
+          <label>Isi header gabungan ke kanan<input name="fill_right_rows" value="1" class="filter-control"></label>
+          <label>Baris data pertama<input name="first_data_row" type="number" min="2" value="3" class="filter-control" required></label>
+        </div>
+        <div class="import-actions">
+          <button class="button-primary" type="submit">Baca kolom</button>
+          <a class="button-outline" href="{% url 'baseline:import_wizard' %}?baru=1">Pilih file lain</a>
+        </div>
+      </form>
+    </section>
+
+  {% elif stage == "mapping" %}
+    <section class="dashboard-card import-panel">
+      <h2>3. Petakan kolom dan periode</h2>
+      <p class="muted">Pemetaan rating Level 3 dilakukan manual. Kolom yang tidak dipetakan diabaikan; sel kosong tidak menghapus nilai lama.</p>
+      <form method="post" class="import-form">
+        {% csrf_token %}<input type="hidden" name="action" value="preview">
+        <label>Periode Baseline
+          <select name="periode_id" class="filter-control" required>
+            <option value="">Pilih periode</option>
+            {% for period in periods %}<option value="{{ period.pk }}"{% if state.periode_id == period.pk|stringformat:"s" %} selected{% endif %}>{{ period.nama }}</option>{% endfor %}
+          </select>
+        </label>
+        <div class="mapping-toolbar"><span class="muted">{{ columns|length }} kolom</span></div>
+        <div class="mapping-list">
+          {% for item in columns %}
+            {% with column=item.column %}
+            <label class="mapping-row">
+              <span><strong>{{ column.letter }}</strong><span>{{ column.header }}</span></span>
+              <select name="column_{{ column.index }}" class="filter-control">
+                <option value="">Abaikan kolom</option>
+                <option value="npsn"{% if item.selected == "npsn" %} selected{% endif %}>NPSN sekolah</option>
+                <option value="summary:skor_pm"{% if item.selected == "summary:skor_pm" %} selected{% endif %}>Skor PM</option>
+                <option value="summary:profil_pm"{% if item.selected == "summary:profil_pm" %} selected{% endif %}>Profil PM</option>
+                <option value="summary:skor_kka"{% if item.selected == "summary:skor_kka" %} selected{% endif %}>Skor KKA</option>
+                <option value="summary:profil_kka"{% if item.selected == "summary:profil_kka" %} selected{% endif %}>Profil KKA</option>
+                <option value="profile_data"{% if item.selected == "profile_data" %} selected{% endif %}>Data profil tambahan</option>
+                {% for item_indicator in indicators %}
+                    <option value="{{ item_indicator.target }}"{% if item.selected == item_indicator.target %} selected{% endif %}>{{ item_indicator.indicator.get_kerangka_display }} · {{ item_indicator.indicator.kode }} — {{ item_indicator.indicator.nama }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            {% endwith %}
+          {% endfor %}
+        </div>
+        <div class="import-actions">
+          <button class="button-primary" type="submit">Validasi dan dry-run</button>
+          <button class="button-outline" name="action" value="cancel" formnovalidate>Batalkan</button>
+        </div>
+      </form>
+    </section>
+
+  {% elif stage == "preview" %}
+    <section class="dashboard-card import-panel">
+      <h2>4. Tinjau dry-run</h2>
+      {% if preview.mapping_errors %}
+        <div class="message message-error"><ul>{% for item in preview.mapping_errors %}<li>{{ item }}</li>{% endfor %}</ul></div>
+      {% else %}
+        <div class="preview-summary">
+          <span><strong>{{ preview.counts.create }}</strong> baru</span>
+          <span><strong>{{ preview.counts.update }}</strong> diperbarui</span>
+          <span><strong>{{ preview.counts.unchanged }}</strong> tanpa perubahan</span>
+          <span><strong>{{ preview.counts.error }}</strong> bermasalah</span>
+        </div>
+      {% endif %}
+
+      {% if unknown_ratings %}
+        <div class="alias-panel">
+          <h3>Rating belum dikenali</h3>
+          <p class="muted">Pilih nilai baku untuk setiap rating sumber. Pilihan disimpan sebagai alias khusus kolom.</p>
+          <form method="post" class="import-form">
+            {% csrf_token %}<input type="hidden" name="action" value="resolve">
+            {% for item in unknown_ratings %}
+              <label class="alias-row"><span>{{ item.header }}: {{ item.value }}</span>
+                <select name="rating_{{ forloop.counter0 }}" class="filter-control" required>
+                  <option value="">Pilih nilai baku</option>
+                  {% for value, label in rating_choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                </select>
+              </label>
+            {% endfor %}
+            <button type="submit" class="button-outline">Terapkan alias dan hitung ulang</button>
+          </form>
+        </div>
+      {% endif %}
+
+      <div class="import-table-wrap"><table class="import-table">
+        <thead><tr><th>Baris</th><th>NPSN</th><th>Aksi</th><th>Rating dipetakan</th><th>Catatan</th></tr></thead>
+        <tbody>
+          {% for row in preview_rows %}
+            <tr>
+              <td>{{ row.row_number }}</td><td>{{ row.npsn|default:"—" }}</td>
+              <td>{% if row.has_error %}<span class="badge badge-amber">Perlu ditinjau</span>{% else %}{{ row.action }}{% endif %}</td>
+              <td>{{ row.indicators|length }}</td>
+              <td>{% for issue in row.issues %}<div class="text-rose-700">{{ issue.message }}</div>{% empty %}<span class="text-slate-400">—</span>{% endfor %}</td>
+            </tr>
+          {% empty %}<tr><td colspan="5">Tidak ada baris data.</td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+      {% if more_rows %}<p class="muted">Menampilkan 100 dari {{ preview.rows|length }} baris; semua baris sudah divalidasi.</p>{% endif %}
+
+      <form method="post" class="import-form commit-form">
+        {% csrf_token %}<input type="hidden" name="action" value="commit">
+        <label>Alasan pada riwayat<input name="reason" maxlength="100" value="Impor baseline" class="filter-control"></label>
+        <label>Jika ada baris bermasalah
+          <select name="error_mode" class="filter-control">
+            <option value="stop">Batalkan seluruh batch</option>
+            <option value="skip">Lewati baris bermasalah</option>
+          </select>
+        </label>
+        <div class="import-actions">
+          <button class="button-primary" type="submit"{% if preview.mapping_errors %} disabled{% endif %}>Simpan batch</button>
+          <button class="button-outline" name="action" value="cancel" formnovalidate>Batalkan</button>
+        </div>
+      </form>
+    </section>
+
+  {% elif stage == "done" %}
+    <section class="dashboard-card import-panel">
+      <h2>Impor baseline berhasil</h2>
+      <p class="muted">Batch #{{ state.result.batch_id }} tersimpan dan dapat di-rollback melalui Riwayat Impor.</p>
+      <div class="preview-summary">
+        <span><strong>{{ state.result.created }}</strong> baru</span>
+        <span><strong>{{ state.result.updated }}</strong> diperbarui</span>
+        <span><strong>{{ state.result.unchanged }}</strong> tanpa perubahan</span>
+        <span><strong>{{ state.result.skipped }}</strong> dilewati</span>
+      </div>
+      <a href="{% url 'baseline:import_wizard' %}?baru=1" class="button-primary">Impor file lain</a>
+      <a href="{% url 'imports:history' %}" class="button-outline">Riwayat impor</a>
+    </section>
+  {% endif %}
+{% endblock %}

@@ -3,6 +3,7 @@
 {% block content %}
   <div class="page-head">
     <div><h1>Riwayat Impor</h1><p class="muted">Batch impor tercatat, termasuk file sumber, hasil, dan status rollback.</p></div>
+    <a href="{% url 'baseline:import_wizard' %}" class="button-primary">Impor Baseline</a>
   </div>
   <section class="overflow-hidden rounded-xl bg-white border border-[#edf0f5] shadow-sm">
     <div class="import-table-wrap">

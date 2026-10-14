@@ -36,6 +36,7 @@ class IndicatorValue:
 class IndicatorIssue:
     header: str
     message: str
+    raw_value: str | None = None
 
 
 @dataclass
@@ -93,6 +94,7 @@ def transform_indicator_values(
                 IndicatorIssue(
                     header=header,
                     message=f"Rating '{raw_text}' pada kolom '{header}' tidak dikenali.",
+                    raw_value=raw_text,
                 )
             )
             continue
