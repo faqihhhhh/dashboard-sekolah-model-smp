@@ -1,38 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Periode{% endblock %}
-{% block heading %}Periode{% endblock %}
+
 {% block content %}
-  <div class="mb-4 flex items-center justify-between gap-4">
-    <p class="text-sm text-slate-600">Periode menjadi sumbu waktu pada chart perkembangan.</p>
-    <a href="{% url 'referensi:periode_create' %}"
-       class="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">+ Tambah periode</a>
+  <div class="page-head mb-4">
+    <div>
+      <h1>Master Periode</h1>
+      <p class="muted">Periode pengukuran (Baseline, Monitoring n, Endline) menjadi sumbu waktu pada grafik perkembangan program.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{% url 'referensi:periode_create' %}" class="button-primary">+ Tambah Periode</a>
+    </div>
   </div>
-  <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-    <table class="min-w-full divide-y divide-slate-200 text-sm">
-      <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-        <tr>
-          <th class="px-4 py-3">Nama</th>
-          <th class="px-4 py-3">Jenis</th>
-          <th class="px-4 py-3">Mulai</th>
-          <th class="px-4 py-3">Selesai</th>
-          <th class="px-4 py-3 text-right">Aksi</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        {% for p in periode_list %}
+
+  <div class="overflow-hidden rounded-xl bg-white border border-[#edf0f5] shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-xs">
+        <thead class="bg-[#f8fafc] text-left text-[11px] font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200">
           <tr>
-            <td class="px-4 py-3 font-medium text-slate-900">{{ p.nama }}</td>
-            <td class="px-4 py-3">{{ p.get_jenis_display }}</td>
-            <td class="px-4 py-3">{{ p.tanggal_mulai|date:"d M Y" }}</td>
-            <td class="px-4 py-3">{{ p.tanggal_selesai|date:"d M Y"|default:"-" }}</td>
-            <td class="px-4 py-3 text-right">
-              <a href="{% url 'referensi:periode_update' p.pk %}" class="font-medium text-blue-600 hover:underline">Ubah</a>
-            </td>
+            <th class="px-4 py-3">Nama</th>
+            <th class="px-4 py-3">Jenis</th>
+            <th class="px-4 py-3">Mulai</th>
+            <th class="px-4 py-3">Selesai</th>
+            <th class="px-4 py-3 text-right">Aksi</th>
           </tr>
-        {% empty %}
-          <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">Belum ada periode. Tambahkan periode Baseline terlebih dahulu.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700">
+          {% for p in periode_list %}
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="px-4 py-3 font-semibold text-slate-900">{{ p.nama }}</td>
+              <td class="px-4 py-3"><span class="badge badge-blue">{{ p.get_jenis_display }}</span></td>
+              <td class="px-4 py-3">{{ p.tanggal_mulai|date:"d M Y" }}</td>
+              <td class="px-4 py-3 text-slate-500">{{ p.tanggal_selesai|date:"d M Y"|default:"—" }}</td>
+              <td class="whitespace-nowrap px-4 py-3 text-right text-xs">
+                <a href="{% url 'referensi:periode_update' p.pk %}" class="font-semibold text-blue-600 hover:text-blue-800">Ubah</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">Belum ada periode. Tambahkan periode Baseline terlebih dahulu.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 {% endblock %}

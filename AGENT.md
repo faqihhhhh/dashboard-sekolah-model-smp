@@ -52,7 +52,7 @@ make seed-demo   # 60 sekolah FIKTIF (hanya DEBUG); hapus: make demo-hapus  (WAJ
 make dev         # build CSS + migrate + runserver  → http://localhost:8000
 make css | css-watch | vendor     # Tailwind / unduh library JS
 make fmt         # ruff check --fix + format
-make check       # django check + lint + pytest (terakhir terverifikasi: 164 passed)
+make check       # django check + lint + pytest (terakhir terverifikasi: 172 passed)
 make wilayah-csv # bangun ulang apps/referensi/data/wilayah.csv (sumber: cahyadsn/wilayah, MIT, commit di-pin)
 make prod-up | prod-down | prod-ps | prod-logs | prod-superuser | prod-seed | prod-backup   # butuh .env.prod
 ```
@@ -158,11 +158,11 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
 - [x] **1.4** — Dataset Registry, Sekolah (CRUD, riwayat, soft delete/pulihkan, dropdown HTMX), data demo
 - [x] **Port tampilan prototipe** — shell, Beranda, dan Surat Dukungan dipindah ke template Django; KPI sekolah dinamis, fitur tanpa model ditampilkan sebagai belum tersedia
 - [x] **1.5** — Docker produksi (Dockerfile bertahap, compose + Caddy, `make prod-*`), diverifikasi pemilik
-- [ ] **Fase 2 — Mesin impor** (inti produk)
+- [x] **Fase 2 — Mesin impor** (inti produk)
   - [x] 2.1 pembaca xlsx/csv aman, header bertingkat + sel gabungan, normalisasi (pilihan, wilayah), validasi + dry-run, perintah `import_dryrun`, `default_aliases` pada spec
   - [x] 2.2 model `ImportBatch`, `MappingProfile`, `ValueAlias`; FK `import_batch` pada model yang diimpor; commit transaksional; rollback
-  - [ ] 2.3 wizard UI (HTMX): unggah → sheet/header → pemetaan kolom (aksi massal) → profil → pemetaan nilai → dry-run → mode/konflik → simpan
-  - [ ] 2.4 laporan error `.xlsx`, riwayat batch, unduh file asli, tombol rollback
+  - [x] 2.3 wizard UI (HTMX): unggah → sheet/header → pemetaan kolom (aksi massal) → profil → pemetaan nilai → dry-run → mode/konflik → simpan
+  - [x] 2.4 laporan error `.xlsx`, riwayat batch, unduh file asli, tombol rollback
 - [ ] **Fase 3 — Baseline** — `HasilBaseline`, `KamusIndikator`, `HasilIndikator` (format panjang); impor lebar→panjang; donut PM/KKA; Panduan Indikator;
   detail sekolah + edit indikator; **komponen chart perkembangan generik** (dataset ber-`time_field`)
 - [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest

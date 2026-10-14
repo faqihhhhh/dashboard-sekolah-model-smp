@@ -1,30 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Wilayah{% endblock %}
-{% block heading %}Wilayah{% endblock %}
 {% block content %}
-  <p class="mb-4 text-sm text-slate-600">
-    {{ total_provinsi }} provinsi · {{ total_kabkota }} kabupaten/kota (Kepmendagri 2025).
-    Untuk mengoreksi data atau menambah alias, gunakan <a href="/admin/referensi/" class="font-medium text-blue-600 hover:underline">halaman admin</a>.
-  </p>
+  <div class="page-head mb-4">
+    <div>
+      <h1>Master Wilayah</h1>
+      <p class="muted">{{ total_provinsi }} provinsi · {{ total_kabkota }} kabupaten/kota (Kepmendagri 2025).</p>
+      <p class="muted">Untuk mengoreksi data atau menambah alias, gunakan <a href="/admin/referensi/" class="link">halaman admin</a>.</p>
+    </div>
+  </div>
 
-  <form method="get" class="mb-4 flex flex-wrap gap-3">
-    <input type="search" name="q" value="{{ q }}" placeholder="Cari nama atau kode..."
-           class="w-64 rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
-    <select name="provinsi"
-            class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
-      <option value="">Semua provinsi</option>
-      {% for p in provinsi_list %}
-        <option value="{{ p.kode }}" {% if p.kode == selected_provinsi %}selected{% endif %}>{{ p.nama }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Terapkan</button>
-    <a href="{% url 'referensi:wilayah_list' %}" class="self-center text-sm text-slate-600 hover:text-slate-900">Reset</a>
-  </form>
+  <div class="dashboard-card filter-card">
+    <form method="get" class="filter-form">
+      <input type="search" name="q" value="{{ q }}" placeholder="Cari nama atau kode..."
+             class="filter-control w-64">
+      <select name="provinsi" class="filter-control">
+        <option value="">Semua provinsi</option>
+        {% for p in provinsi_list %}
+          <option value="{{ p.kode }}" {% if p.kode == selected_provinsi %}selected{% endif %}>{{ p.nama }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="button-primary button-compact">Terapkan</button>
+      <a href="{% url 'referensi:wilayah_list' %}" class="text-xs text-slate-500 hover:text-slate-800">Reset</a>
+    </form>
+  </div>
 
-  <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+  <div class="overflow-hidden rounded-xl bg-white border border-[#edf0f5] shadow-sm">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-slate-200 text-sm">
-        <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <table class="min-w-full divide-y divide-slate-200 text-xs">
+        <thead class="bg-[#f8fafc] text-left text-[11px] font-bold uppercase tracking-wider text-slate-600">
           <tr>
             <th class="px-4 py-3">Kode</th>
             <th class="px-4 py-3">Nama</th>
@@ -32,16 +35,16 @@
             <th class="px-4 py-3">Provinsi</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
+        <tbody class="divide-y divide-slate-100 text-slate-700">
           {% for k in kabkota_list %}
-            <tr>
-              <td class="px-4 py-2.5 font-mono text-xs text-slate-500">{{ k.kode }}</td>
-              <td class="px-4 py-2.5 font-medium text-slate-900">{{ k.nama }}</td>
-              <td class="px-4 py-2.5">{{ k.get_jenis_display }}</td>
-              <td class="px-4 py-2.5 text-slate-600">{{ k.provinsi.nama }}</td>
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="px-4 py-3 font-mono text-slate-500">{{ k.kode }}</td>
+              <td class="px-4 py-3 font-semibold text-slate-900">{{ k.nama }}</td>
+              <td class="px-4 py-3">{{ k.get_jenis_display }}</td>
+              <td class="px-4 py-3 text-slate-600">{{ k.provinsi.nama }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="4" class="px-4 py-6 text-center text-slate-500">
+            <tr><td colspan="4" class="px-4 py-12 text-center text-slate-400">
               {% if total_kabkota == 0 %}Data wilayah belum diisi. Jalankan <code>make seed</code>.{% else %}Tidak ada data yang cocok.{% endif %}
             </td></tr>
           {% endfor %}

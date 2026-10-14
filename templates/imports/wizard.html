@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Impor {{ spec.label }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Impor {{ spec.label }}</h1>
+      <p class="muted">Petakan kolom secara manual, tinjau hasil dry-run, lalu simpan dalam satu batch yang dapat di-rollback.</p>
+    </div>
+    <a href="{{ dataset_list_url }}" class="button-outline">Kembali ke daftar</a>
+  </section>
+
+  <nav class="import-steps" aria-label="Tahapan impor">
+    {% for key, label in steps %}
+      <span class="import-step{% if forloop.counter0 == step_index %} active{% elif forloop.counter0 < step_index %} complete{% endif %}">
+        <span>{{ forloop.counter }}</span>{{ label }}
+      </span>
+    {% endfor %}
+  </nav>
+
+  {% if error %}<div class="message message-error" role="alert">{{ error }}</div>{% endif %}
+
+  {% if stage == "upload" %}
+    <section class="dashboard-card import-panel">
+      <h2>1. Pilih berkas</h2>
+      <p class="muted">Format .xlsx dan .csv, maksimal 20 MB. Berkas disimpan di area privat dan tidak disajikan sebagai URL publik.</p>
+      <form method="post" enctype="multipart/form-data" hx-boost="true" hx-encoding="multipart/form-data" class="import-form">
+        {% csrf_token %}<input type="hidden" name="action" value="upload">
+        <label class="field-label" for="import-file">Berkas Excel atau CSV</label>
+        <input id="import-file" type="file" name="file" accept=".xlsx,.csv" required class="file-control">
+        <div class="import-options">
+          <label>Encoding CSV
+            <select name="encoding" class="filter-control">
+              <option value="">Pilih encoding</option>
+              {% for value in encodings %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+            </select>
+          </label>
+          <label>Pemisah CSV
+            <select name="delimiter" class="filter-control">
+              <option value="">Pilih pemisah</option>
+              {% for value, label in delimiters %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </label>
+        </div>
+        <button class="button-primary" type="submit">Lanjutkan</button>
+      </form>
+    </section>
+
+  {% elif stage == "headers" %}
+    <section class="dashboard-card import-panel">
+      <h2>2. Pilih sheet dan baris header</h2>
+      <p class="muted">File: <strong>{{ state.filename }}</strong>. Nomor baris dimulai dari 1. Untuk header bertingkat, pisahkan nomor baris dengan koma.</p>
+      <form method="post" hx-boost="true" class="import-form">
+        {% csrf_token %}<input type="hidden" name="action" value="headers">
+        {% if state.suffix == ".xlsx" %}
+          <label class="field-label">Sheet
+            <select name="sheet" required class="filter-control">
+              <option value="">Pilih sheet</option>
+              {% for sheet in sheets %}<option value="{{ sheet }}"{% if sheet == state.sheet %} selected{% endif %}>{{ sheet }}</option>{% endfor %}
+            </select>
+          </label>
+        {% else %}<input type="hidden" name="sheet" value="CSV">{% endif %}
+        <div class="import-options">
+          <label>Baris header
+            <input name="header_rows" value="1" inputmode="numeric" placeholder="mis. 1 atau 1,2" required class="filter-control">
+          </label>
+          <label>Isi sel header gabungan ke kanan
+            <input name="fill_right_rows" inputmode="numeric" placeholder="opsional, mis. 1" class="filter-control">
+          </label>
+          <label>Baris pertama data
+            <input name="first_data_row" value="2" type="number" min="2" required class="filter-control">
+          </label>
+        </div>
+        <div class="import-actions">
+          <button class="button-primary" type="submit">Baca header</button>
+          <a class="button-outline" href="{{ wizard_url }}?baru=1">Pilih file lain</a>
+        </div>
+      </form>
+    </section>
+
+  {% elif stage == "mapping" %}
+    <section class="dashboard-card import-panel" x-data>
+      <h2>3. Petakan kolom</h2>
+      <p class="muted">Setiap field hanya dapat dipetakan dari satu kolom. Kolom yang tidak dipetakan akan diabaikan; field kosong tidak menimpa data lama.</p>
+      {% if matching_profiles %}
+        <form method="post" class="profile-load">
+          {% csrf_token %}<input type="hidden" name="action" value="profile">
+          <label>Profil dengan header yang sama
+            <select name="profile" class="filter-control" required>
+              {% for profile in matching_profiles %}<option value="{{ profile.pk }}">{{ profile.nama }}</option>{% endfor %}
+            </select>
+          </label>
+          <button class="button-outline button-compact" type="submit">Muat profil untuk ditinjau</button>
+        </form>
+      {% endif %}
+      <form method="post" hx-boost="true" class="import-form">
+        {% csrf_token %}<input type="hidden" name="action" value="preview">
+        <div class="mapping-toolbar">
+          <span class="muted">{{ columns|length }} kolom terdeteksi</span>
+          <button type="button" class="button-outline button-compact" @click="$refs.mappingForm.querySelectorAll('select').forEach((field) =&gt; field.value = '')">Abaikan semua kolom</button>
+        </div>
+        <div class="mapping-list" x-ref="mappingForm">
+          {% for item in mapping_columns %}
+            {% with column=item.column %}
+            <label class="mapping-row">
+              <span><strong>{{ column.letter }}</strong><span>{{ column.header }}</span></span>
+              <select name="column_{{ column.index }}" class="filter-control">
+                <option value="">Jangan impor kolom ini</option>
+                {% for field in fields %}
+                  <option value="{{ field.name }}"{% if item.selected == field.name %} selected{% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            {% endwith %}
+          {% endfor %}
+        </div>
+        <button class="button-primary" type="submit">Validasi dan dry-run</button>
+      </form>
+    </section>
+
+  {% elif stage == "preview" %}
+    <section class="dashboard-card import-panel">
+      <h2>4. Tinjau hasil dry-run</h2>
+      <p class="muted">Baris dengan kunci yang sudah ada akan diperbarui hanya pada kolom terpetakan; baris yang sama persis tidak diubah.</p>
+      {% if preview.mapping_errors %}
+        <div class="message message-error"><strong>Pemetaan belum valid</strong><ul>{% for item in preview.mapping_errors %}<li>{{ item }}</li>{% endfor %}</ul></div>
+      {% else %}
+        <div class="preview-summary">
+          <span><strong>{{ preview.counts.create }}</strong> baru</span>
+          <span><strong>{{ preview.counts.update }}</strong> diperbarui</span>
+          <span><strong>{{ preview.counts.unchanged }}</strong> tanpa perubahan</span>
+          <span class="{% if preview.counts.error %}text-rose-700{% endif %}"><strong>{{ preview.counts.error }}</strong> bermasalah</span>
+        </div>
+      {% endif %}
+
+      {% if unknown_fields %}
+        <div class="alias-panel">
+          <h3>Nilai yang belum dikenali</h3>
+          <p class="muted">Pilih nilai baku untuk setiap alias. Nilai ini akan disimpan agar dapat digunakan pada impor berikutnya.</p>
+          <form method="post" hx-boost="true" class="import-form">
+            {% csrf_token %}<input type="hidden" name="action" value="resolve">
+            {% for item in unknown_fields %}
+              <fieldset><legend>{{ item.label }}</legend>
+                {% for value in item.values %}
+                  <label class="alias-row"><span>{{ value }}</span>
+                    <select name="alias_{{ item.name }}_{{ value }}" class="filter-control">
+                      <option value="">Belum dipetakan</option>
+                      {% for option_value, option_label in item.options %}<option value="{{ option_value }}">{{ option_label }}</option>{% endfor %}
+                    </select>
+                  </label>
+                {% endfor %}
+              </fieldset>
+            {% endfor %}
+            <button type="submit" class="button-outline">Terapkan pemetaan nilai dan hitung ulang</button>
+          </form>
+        </div>
+      {% endif %}
+
+      {% if preview.rows %}
+        <div class="import-table-wrap"><table class="import-table">
+          <thead><tr><th>Baris</th><th>Aksi</th><th>Data</th><th>Catatan validasi</th></tr></thead>
+          <tbody>
+            {% for row in preview_rows %}
+              <tr><td>{{ row.row_number }}</td>
+                <td><span class="badge {% if row.has_error %}badge-amber{% elif row.action == 'create' %}badge-green{% else %}badge-blue{% endif %}">{% if row.has_error %}Perlu ditinjau{% else %}{{ row.action }}{% endif %}</span></td>
+                <td>{% for header, value in row.raw.items %}{% if value %}<span class="preview-value"><strong>{{ header }}:</strong> {{ value }}</span>{% endif %}{% endfor %}</td>
+                <td>{% for issue in row.issues %}<div class="{% if issue.level == 'error' %}text-rose-700{% else %}text-slate-500{% endif %}">{{ issue.message }}</div>{% empty %}<span class="text-slate-400">—</span>{% endfor %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+        {% if more_rows %}<p class="muted">Menampilkan 100 dari {{ preview.rows|length }} baris. Semua baris tetap ikut divalidasi.</p>{% endif %}
+      {% endif %}
+
+      <form method="post" hx-boost="true" class="import-form commit-form">
+        {% csrf_token %}<input type="hidden" name="action" value="commit">
+        <label>Alasan pada riwayat perubahan
+          <input name="reason" maxlength="100" value="Impor melalui wizard" class="filter-control">
+        </label>
+        <label>Saat ada baris bermasalah
+          <select name="error_mode" class="filter-control">
+            <option value="stop">Batalkan seluruh impor jika ada error</option>
+            <option value="skip">Lewati baris bermasalah, simpan baris valid</option>
+          </select>
+        </label>
+        <label class="check-label"><input type="checkbox" name="save_profile" value="1"> Simpan pemetaan sebagai profil</label>
+        <input name="profile_name" maxlength="100" placeholder="Nama profil (opsional)" class="filter-control">
+        <div class="import-actions">
+          <button type="submit" class="button-primary"{% if preview.mapping_errors %} disabled{% endif %}>Simpan impor</button>
+          <button type="submit" name="action" value="cancel" formnovalidate class="button-outline">Batalkan</button>
+        </div>
+      </form>
+    </section>
+
+  {% elif stage == "done" %}
+    <section class="dashboard-card import-panel">
+      <h2>Impor berhasil disimpan</h2>
+      <p class="muted">Batch #{{ state.result.batch_id }} tercatat. Baris yang dibuat dan diperbarui dapat dibatalkan melalui fitur rollback.</p>
+      <div class="preview-summary">
+        <span><strong>{{ state.result.created }}</strong> baru</span>
+        <span><strong>{{ state.result.updated }}</strong> diperbarui</span>
+        <span><strong>{{ state.result.unchanged }}</strong> tanpa perubahan</span>
+        <span><strong>{{ state.result.skipped }}</strong> dilewati</span>
+      </div>
+      <a href="{{ wizard_url }}?baru=1" class="button-primary">Impor file lain</a>
+    </section>
+  {% endif %}
+{% endblock %}

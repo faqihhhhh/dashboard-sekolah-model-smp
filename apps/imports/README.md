@@ -33,4 +33,20 @@ uv run python manage.py import_dryrun sekolah data.xlsx --sheet Data --mapping p
 uv run python manage.py import_dryrun sekolah data.csv --mapping pemetaan-sekolah.json --encoding utf-8 --delimiter ';'
 ```
 
-Untuk CSV, pilihan encoding dan delimiter wajib ditulis. Untuk XLSX dengan beberapa sheet, `--sheet` wajib ditulis. Dry-run hanya menampilkan ringkasan aksi, nilai yang belum dikenal, dan error per baris; penyimpanan data menyusul di tahap berikutnya.
+Untuk CSV, pilihan encoding dan delimiter wajib ditulis. Untuk XLSX dengan beberapa sheet, `--sheet` wajib ditulis. Dry-run hanya menampilkan ringkasan aksi, nilai yang belum dikenal, dan error per baris.
+
+## Wizard web (tahap 2.3)
+
+Admin dan Super Admin dapat membuka **Impor Data** dari daftar dataset. Wizard server-rendered menyediakan tahapan:
+
+1. Unggah `.xlsx` atau `.csv` (maksimal 20 MB); encoding dan delimiter CSV harus dipilih eksplisit.
+2. Pilih sheet, baris header, opsi isi-kanan untuk sel header gabungan, dan baris awal data.
+3. Petakan setiap kolom sumber secara manual ke field registry. Profil hanya ditawarkan jika header sama persis dan tetap harus ditinjau.
+4. Jalankan dry-run, tetapkan alias untuk nilai yang tidak dikenal, lalu pilih apakah error membatalkan seluruh batch atau baris error dilewati.
+5. Simpan perubahan sebagai satu batch. File asli disimpan di `MEDIA_ROOT` (di luar URL publik), dan halaman batch dapat di-rollback sesuai peran.
+
+File sementara wizard berada di `MEDIA_ROOT/import-staging/`; hapus dengan tombol **Batalkan** bila tidak jadi melanjutkan. Pengguna dapat memilih alasan audit dan menyimpan pemetaan sebagai profil.
+
+## Riwayat batch (tahap 2.4)
+
+Menu **Riwayat Impor** menampilkan batch, ringkasan hasil, dan status rollback. Detail batch menyediakan unduhan file asli melalui endpoint berizin, laporan baris yang dilewati dalam `.xlsx`, serta tombol rollback. Admin dan Super Admin harus masuk; Admin hanya dapat me-rollback batch miliknya, sedangkan Super Admin dapat me-rollback batch mana pun. Baris error hanya dicatat sebagai laporan bila Admin memilih untuk melewatinya saat menyimpan.

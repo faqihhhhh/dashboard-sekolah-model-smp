@@ -220,6 +220,9 @@ def commit_preview(
         batch.unchanged_count = result.unchanged
         batch.skipped_count = result.skipped
         batch.error_count = len(result.errors)
+        change_log["errors"] = [
+            {"row": row_number, "message": message} for row_number, message in result.errors
+        ]
         batch.change_log = change_log
         batch.save()
 

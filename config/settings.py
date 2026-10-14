@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "apps.referensi",
     "apps.sekolah",
     "apps.imports",
+    "apps.baseline",
     "simple_history",
 ]
 

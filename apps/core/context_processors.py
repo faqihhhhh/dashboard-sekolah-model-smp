@@ -21,6 +21,7 @@ NAV = [
         [
             NavItem("Beranda", "core:home"),
             NavItem("Daftar Sekolah", "sekolah:list"),
+            NavItem("Riwayat Impor", "imports:history", Role.ADMIN),
             NavItem("Surat Dukungan", "core:surat_dukungan"),
             NavItem("Baseline Sekolah"),
         ],

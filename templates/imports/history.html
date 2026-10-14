@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Riwayat Impor{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div><h1>Riwayat Impor</h1><p class="muted">Batch impor tercatat, termasuk file sumber, hasil, dan status rollback.</p></div>
+  </div>
+  <section class="overflow-hidden rounded-xl bg-white border border-[#edf0f5] shadow-sm">
+    <div class="import-table-wrap">
+      <table class="import-table batch-table">
+        <thead><tr><th>Batch</th><th>Dataset dan file</th><th>Waktu / pelaksana</th><th>Hasil</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for batch in batches %}
+            <tr>
+              <td><strong>#{{ batch.pk }}</strong></td>
+              <td><strong>{{ batch.get_dataset_key_display|default:batch.dataset_key }}</strong><br><span class="text-slate-500">{{ batch.filename }}</span></td>
+              <td>{{ batch.created_at|date:"d M Y, H:i" }}<br><span class="text-slate-500">{{ batch.created_by.full_name }}</span></td>
+              <td>{{ batch.created_count }} baru · {{ batch.updated_count }} diperbarui<br>{{ batch.skipped_count }} dilewati · {{ batch.error_count }} error</td>
+              <td>{% if batch.status == "rolled_back" %}<span class="badge badge-slate">Rollback</span>{% else %}<span class="badge badge-green">Tersimpan</span>{% endif %}</td>
+              <td><a class="button-outline button-compact" href="{% url 'imports:batch_detail' batch.pk %}">Detail</a></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-slate-400">Belum ada batch impor.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

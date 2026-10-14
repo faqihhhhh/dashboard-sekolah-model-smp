@@ -18,3 +18,15 @@ fetch_npm() {
 
 fetch_npm htmx.org "$HTMX_VERSION" dist/htmx.min.js static/vendor/htmx.min.js
 fetch_npm alpinejs "$ALPINE_VERSION" dist/cdn.min.js static/vendor/alpine.min.js
+
+# Font Plus Jakarta Sans (disimpan lokal, tanpa CDN)
+mkdir -p static/fonts
+FONT_VERSION="5.0.21"
+curl -fsSL "https://registry.npmjs.org/@fontsource/plus-jakarta-sans/-/plus-jakarta-sans-${FONT_VERSION}.tgz" \
+  | tar -xz -C static/fonts/ --strip-components=2 \
+    "package/files/plus-jakarta-sans-latin-400-normal.woff2" \
+    "package/files/plus-jakarta-sans-latin-500-normal.woff2" \
+    "package/files/plus-jakarta-sans-latin-600-normal.woff2" \
+    "package/files/plus-jakarta-sans-latin-700-normal.woff2" \
+    "package/files/plus-jakarta-sans-latin-800-normal.woff2"
+echo "ok: fonts static/fonts/ (Plus Jakarta Sans woff2)"

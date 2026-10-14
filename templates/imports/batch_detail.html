@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Batch Impor #{{ batch.pk }}{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div><h1>Batch Impor #{{ batch.pk }}</h1><p class="muted">{{ batch.dataset_key }} · {{ batch.filename }} · {{ batch.created_at|date:"d M Y, H:i" }}</p></div>
+    <a href="{% url 'imports:history' %}" class="button-outline">&larr; Riwayat impor</a>
+  </div>
+  <section class="dashboard-card batch-detail">
+    <dl class="batch-metrics">
+      <div><dt>Total baris</dt><dd>{{ batch.total_rows }}</dd></div>
+      <div><dt>Baru</dt><dd>{{ batch.created_count }}</dd></div>
+      <div><dt>Diperbarui</dt><dd>{{ batch.updated_count }}</dd></div>
+      <div><dt>Tidak berubah</dt><dd>{{ batch.unchanged_count }}</dd></div>
+      <div><dt>Dilewati</dt><dd>{{ batch.skipped_count }}</dd></div>
+      <div><dt>Error</dt><dd>{{ batch.error_count }}</dd></div>
+    </dl>
+    <p class="muted">Dibuat oleh {{ batch.created_by.full_name }}{% if batch.sheet_name %} · Sheet: {{ batch.sheet_name }}{% endif %}</p>
+    {% if batch.status == "rolled_back" %}
+      <div class="message">Batch dibatalkan pada {{ batch.rolled_back_at|date:"d M Y, H:i" }}{% if batch.rolled_back_by %} oleh {{ batch.rolled_back_by.full_name }}{% endif %}.</div>
+    {% endif %}
+    <div class="import-actions">
+      {% if batch.file %}<a href="{% url 'imports:batch_file' batch.pk %}" class="button-outline">Unduh file asli</a>{% endif %}
+      {% if batch.error_count %}<a href="{% url 'imports:error_report' batch.pk %}" class="button-outline">Unduh laporan error (.xlsx)</a>{% endif %}
+    </div>
+  </section>
+  {% if can_rollback %}
+    <section class="dashboard-card rollback-panel">
+      <h2>Rollback batch ini</h2>
+      <p class="muted">Data baru dari batch akan di-soft-delete dan perubahan data lama dikembalikan. Tindakan ini tercatat di riwayat perubahan.</p>
+      <form method="post" action="{% url 'imports:rollback' batch.pk %}" class="import-form">
+        {% csrf_token %}
+        <label class="check-label"><input type="checkbox" name="confirm" value="1" required> Saya memahami dan ingin membatalkan seluruh perubahan batch ini.</label>
+        <label>Alasan rollback <input name="reason" maxlength="100" class="filter-control" placeholder="Opsional"></label>
+        <button type="submit" class="button-danger">Rollback batch</button>
+      </form>
+    </section>
+  {% elif rollback_reason %}
+    <p class="muted">{{ rollback_reason }}</p>
+  {% endif %}
+{% endblock %}

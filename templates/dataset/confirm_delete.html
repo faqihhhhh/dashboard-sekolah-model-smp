@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Hapus {{ spec.label }}{% endblock %}
-{% block heading %}Hapus {{ spec.label }}{% endblock %}
 {% block content %}
-  <div class="max-w-xl rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+  <div class="page-head mb-4"><div><h1>Hapus {{ spec.label }}</h1><p class="muted">Konfirmasi penghapusan data.</p></div></div>
+  <div class="dashboard-card max-w-xl">
     <p class="text-sm text-slate-700">Hapus <strong>{{ object }}</strong>?</p>
-    <p class="mt-2 text-sm text-slate-500">Data tidak hilang permanen: ia disembunyikan dan dapat dipulihkan oleh Super Admin.</p>
+    <p class="mt-2 text-sm text-slate-500">Data tidak hilang permanen: data disembunyikan dan dapat dipulihkan oleh Super Admin.</p>
     <form method="post" class="mt-6 flex items-center gap-3">
       {% csrf_token %}
-      <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Ya, hapus</button>
-      <a href="{{ cancel_url }}" class="text-sm text-slate-600 hover:text-slate-900">Batal</a>
+      <button type="submit" class="button-danger">Ya, hapus</button>
+      <a href="{{ cancel_url }}" class="button-outline">Batal</a>
     </form>
   </div>
 {% endblock %}

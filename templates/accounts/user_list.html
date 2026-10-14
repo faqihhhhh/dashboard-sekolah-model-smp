@@ -1,41 +1,57 @@
 {% extends "base.html" %}
 {% block title %}Pengguna{% endblock %}
-{% block heading %}Pengguna{% endblock %}
+
 {% block content %}
-  <div class="mb-4 flex justify-end">
-    <a href="{% url 'accounts:user_create' %}"
-       class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">+ Tambah pengguna</a>
+  <div class="page-head mb-4">
+    <div>
+      <h1>Manajemen Pengguna</h1>
+      <p class="muted">Kelola akun pengguna, penugasan peran akses, dan status keaktifan akun.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{% url 'accounts:user_create' %}" class="button-primary">+ Tambah Pengguna</a>
+    </div>
   </div>
-  <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-    <table class="min-w-full divide-y divide-slate-200 text-sm">
-      <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-        <tr>
-          <th class="px-4 py-3">Nama</th>
-          <th class="px-4 py-3">Email</th>
-          <th class="px-4 py-3">Peran</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3 text-right">Aksi</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        {% for u in users %}
+
+  <div class="overflow-hidden rounded-xl bg-white border border-[#edf0f5] shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-xs">
+        <thead class="bg-[#f8fafc] text-left text-[11px] font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200">
           <tr>
-            <td class="px-4 py-3 font-medium text-slate-900">{{ u.full_name }}</td>
-            <td class="px-4 py-3 text-slate-600">{{ u.email }}</td>
-            <td class="px-4 py-3">{{ u.get_role_display }}</td>
-            <td class="px-4 py-3">
-              {% if u.is_active %}<span class="text-emerald-700">Aktif</span>{% else %}<span class="text-slate-400">Nonaktif</span>{% endif %}
-            </td>
-            <td class="whitespace-nowrap px-4 py-3 text-right">
-              <a href="{% url 'accounts:user_update' u.pk %}" class="font-medium text-blue-600 hover:underline">Ubah</a>
-              <span class="px-1 text-slate-300">|</span>
-              <a href="{% url 'accounts:user_password' u.pk %}" class="font-medium text-blue-600 hover:underline">Kata sandi</a>
-            </td>
+            <th class="px-4 py-3">Nama</th>
+            <th class="px-4 py-3">Email</th>
+            <th class="px-4 py-3">Peran</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3 text-right">Aksi</th>
           </tr>
-        {% empty %}
-          <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">Belum ada pengguna.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700">
+          {% for u in users %}
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="px-4 py-3 font-semibold text-slate-900">{{ u.full_name }}</td>
+              <td class="px-4 py-3 text-slate-600 font-mono">{{ u.email }}</td>
+              <td class="px-4 py-3">
+                <span class="badge {% if u.role == 'super_admin' %}badge-amber{% elif u.role == 'admin' %}badge-blue{% else %}badge-slate{% endif %}">
+                  {{ u.get_role_display }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                {% if u.is_active %}
+                  <span class="badge badge-green">Aktif</span>
+                {% else %}
+                  <span class="badge badge-slate">Nonaktif</span>
+                {% endif %}
+              </td>
+              <td class="whitespace-nowrap px-4 py-3 text-right text-xs">
+                <a href="{% url 'accounts:user_update' u.pk %}" class="font-semibold text-blue-600 hover:text-blue-800">Ubah</a>
+                <span class="px-1 text-slate-300">|</span>
+                <a href="{% url 'accounts:user_password' u.pk %}" class="font-semibold text-slate-600 hover:text-slate-800">Kata sandi</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">Belum ada pengguna terdaftar.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 {% endblock %}

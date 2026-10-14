@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Riwayat {{ spec.label }}{% endblock %}
-{% block heading %}Riwayat perubahan{% endblock %}
 {% block content %}
-  <p class="mb-4 text-sm text-slate-600">{{ object }} · <a href="{{ back_url }}" class="font-medium text-blue-600 hover:underline">&larr; Kembali ke daftar</a></p>
+  <div class="page-head mb-4">
+    <div><h1>Riwayat Perubahan</h1><p class="muted">{{ object }}</p></div>
+    <a href="{{ back_url }}" class="button-outline">&larr; Kembali ke daftar</a>
+  </div>
   <div class="space-y-3">
     {% for entry in entries %}
-      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-        <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
+      <div class="dashboard-card">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
           <span class="font-semibold text-slate-900">{{ entry.kind }}</span>
           <span class="text-slate-500">
             {{ entry.record.history_date|date:"d M Y, H:i" }} ·
