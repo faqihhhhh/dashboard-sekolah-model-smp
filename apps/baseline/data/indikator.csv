@@ -1,0 +1,57 @@
+﻿kerangka,level,kode,nama,parent_level,parent_code,urutan
+pm,L1,Murid,Murid,,,1
+pm,L2,1.1,Budaya Belajar,L1,Murid,1
+pm,L3,1.1.1,Memuliakan,L2,1.1,1
+pm,L3,1.1.2,Berkesadaran,L2,1.1,2
+pm,L3,1.1.3,Bermakna,L2,1.1,3
+pm,L3,1.1.4,Menggembirakan,L2,1.1,4
+pm,L3,1.1.5,Otonomi Belajar,L2,1.1,5
+pm,L3,1.1.6,Refleksi,L2,1.1,6
+pm,L1,Guru,Guru,,,2
+pm,L2,2.1,Mengajar secara Efektif,L1,Guru,2
+pm,L3,2.1.1,Memuliakan,L2,2.1,7
+pm,L3,2.1.2,Pengelolaan Pembelajaran,L2,2.1,8
+pm,L3,2.1.3,Refleksi,L2,2.1,9
+pm,L2,2.2,Asesmen Otentik & Berkeadilan,L1,Guru,3
+pm,L3,2.2.1,Formatif,L2,2.2,10
+pm,L3,2.2.2,Sumatif,L2,2.2,11
+pm,L2,2.3,Pengembangan Diri,L1,Guru,4
+pm,L3,2.3.1,Belajar secara Mandiri,L2,2.3,12
+pm,L3,2.3.2,Belajar bersama Komunitas,L2,2.3,13
+pm,L1,Kepala Satpen,Kepala Satpen,,,3
+pm,L2,3.1,Kepemimpinan Pembelajaran Mendalam,L1,Kepala Satpen,5
+pm,L3,3.1.1,Memimpin Implementasi PM,L2,3.1,14
+pm,L3,3.1.2,Menyelaraskan visi Misi Sekolah dengan PM Bersama Pemangku Kepentingan,L2,3.1,15
+pm,L3,3.1.3,Melakukan supervisi instruksional PM,L2,3.1,16
+pm,L3,3.1.4,Memimpin refleksi,L2,3.1,17
+pm,L2,3.2,Pengelolaan Sumber Daya,L1,Kepala Satpen,6
+pm,L3,3.2.1,Mengembangkan dan Menguatkan Kapasitas Pendidik dan Tenaga Kependidikan,L2,3.2,18
+pm,L3,3.2.2,Mengoptimalisasi Sumber Daya untuk Kegiatan Pendidikan,L2,3.2,19
+pm,L3,3.2.3,Manajemen Sekolah,L2,3.2,20
+pm,L2,3.3,Kemitraan dan Ekosistem,L1,Kepala Satpen,7
+pm,L3,3.3.1,"Mengembangkan Kemitraan dengan orang tua, masyarakat, komunitas sekolah, DUDI",L2,3.3,21
+pm,L3,3.3.2,"Lingkungan Belajar yang saling Memuliakan, aman, dan Nyaman",L2,3.3,22
+pm,L2,3.4,Pemanfaatan Teknologi Digital,L1,Kepala Satpen,8
+pm,L3,3.4.1,Mengembangkan infrastruktur teknologi digital untuk pembelajaran dan administrasi,L2,3.4,23
+pm,L3,3.4.2,Meningkatkan Kapasitas Pendidik dan Tenaga Kependidikan dalam Memanfaatkan TIK,L2,3.4,24
+kka,L1,Murid,Murid,,,1
+kka,L2,1.1,Budaya Belajar,L1,Murid,1
+kka,L3,1.1.1,Projek Koding dan KA yang dikembangkan murid,L2,1.1,1
+kka,L1,Guru,Guru,,,2
+kka,L2,2.1,Mengajar secara Efektif,L1,Guru,2
+kka,L3,2.1.1,Literasi digital guru,L2,2.1,2
+kka,L3,2.1.2,Pemanfaatan teknologi secara kontekstual dalam pelaksanaan/pengelolaan pembelajaran,L2,2.1,3
+kka,L2,2.2,Asesmen Otentik & Berkeadilan,L1,Guru,3
+kka,L3,2.2.1,Pemanfaatan teknologi secara kontekstual dalam penilaian pembelajaran,L2,2.2,4
+kka,L1,Kepala Satpen,Kepala Satpen,,,3
+kka,L2,3.1,Kepemimpinan Pembelajaran Mendalam,L1,Kepala Satpen,4
+kka,L3,3.1.1,Memimpin implementasi Koding dan Kecerdasan Artifisial,L2,3.1,5
+kka,L3,3.1.2,Supervisi pembelajaran Koding dan Kecerdasan Artifisial,L2,3.1,6
+kka,L2,3.2,Pengelolaan Sumber Daya,L1,Kepala Satpen,5
+kka,L3,3.2.1,Penguatan kapasitas dan aktivasi komunitas belajar pendidik pengampu Koding dan KA,L2,3.2,7
+kka,L3,3.2.2,Penyediaan sumber belajar Koding dan KA,L2,3.2,8
+kka,L2,3.3,Kemitraan dan Ekosistem,L1,Kepala Satpen,6
+kka,L3,3.3.1,Pengembangan kemitraan untuk mendukung pembelajaran Koding dan KA,L2,3.3,9
+kka,L2,3.4,Pemanfaatan Teknologi Digital,L1,Kepala Satpen,7
+kka,L3,3.4.1,Penyediaan sarana dan prasarana digital yang mendukung pembelajaran Koding dan KA,L2,3.4,10
+kka,L3,3.4.2,Mendorong pemanfaatan teknologi digital secara kontekstual untuk mendukung pelaksanaan pembelajaran Koding dan KA yang bermakna,L2,3.4,11

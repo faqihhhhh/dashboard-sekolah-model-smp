@@ -42,10 +42,12 @@ class HasilBaseline(SoftDeleteModel):
         on_delete=models.PROTECT,
         related_name="hasil_baseline",
     )
-    skor_pm = models.DecimalField("skor PM", max_digits=12, decimal_places=4, null=True, blank=True)
+    skor_pm = models.DecimalField(
+        "skor PM", max_digits=16, decimal_places=10, null=True, blank=True
+    )
     profil_pm = models.CharField("profil PM", max_length=100, blank=True)
     skor_kka = models.DecimalField(
-        "skor KKA", max_digits=12, decimal_places=4, null=True, blank=True
+        "skor KKA", max_digits=16, decimal_places=10, null=True, blank=True
     )
     profil_kka = models.CharField("profil KKA", max_length=100, blank=True)
     profil_data = models.JSONField("data profil", default=dict, blank=True)
@@ -83,6 +85,14 @@ class KamusIndikator(TimeStampedModel):
     kode = models.CharField("kode indikator", max_length=20)
     nama = models.CharField("nama indikator", max_length=200)
     deskripsi = models.TextField("panduan indikator", blank=True)
+    parent = models.ForeignKey(
+        "self",
+        verbose_name="indikator induk",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="children",
+    )
     urutan = models.PositiveSmallIntegerField("urutan", default=0)
     aktif = models.BooleanField("aktif", default=True)
 
@@ -99,6 +109,52 @@ class KamusIndikator(TimeStampedModel):
 
     def __str__(self):
         return f"{self.get_kerangka_display()} {self.level} · {self.kode} — {self.nama}"
+
+    def clean(self):
+        super().clean()
+        if not self.level or not self.parent_id:
+            if self.level == LevelIndikator.L1 and self.parent_id:
+                raise ValidationError({"parent": "Indikator Level 1 tidak memiliki induk."})
+            if self.level in (LevelIndikator.L2, LevelIndikator.L3) and not self.parent_id:
+                raise ValidationError({"parent": "Indikator Level 2 dan 3 harus memiliki induk."})
+            return
+        parent = self.parent
+        expected_level = {
+            LevelIndikator.L2: LevelIndikator.L1,
+            LevelIndikator.L3: LevelIndikator.L2,
+        }.get(self.level)
+        if expected_level is None:
+            raise ValidationError({"parent": "Level indikator tidak valid."})
+        if parent.level != expected_level:
+            raise ValidationError({"parent": f"Induk harus berada pada {expected_level}."})
+        if parent.kerangka != self.kerangka:
+            raise ValidationError({"parent": "Kerangka indikator dan induk harus sama."})
+
+
+class PanduanRating(TimeStampedModel):
+    """Uraian rubrik rating yang disediakan pada sheet MASTER file sumber baseline."""
+
+    indikator = models.ForeignKey(
+        KamusIndikator,
+        verbose_name="indikator",
+        on_delete=models.CASCADE,
+        related_name="panduan_rating",
+    )
+    rating = models.CharField("rating", max_length=20, choices=RatingIndikator.choices)
+    deskripsi = models.TextField("uraian rating")
+
+    class Meta:
+        ordering = ["indikator__kerangka", "indikator__urutan", "rating"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["indikator", "rating"], name="uniq_panduan_rating_indikator_rating"
+            )
+        ]
+        verbose_name = "panduan rating"
+        verbose_name_plural = "panduan rating"
+
+    def __str__(self):
+        return f"{self.indikator.kode} · {self.get_rating_display()}"
 
 
 class HasilIndikator(SoftDeleteModel):
@@ -122,6 +178,15 @@ class HasilIndikator(SoftDeleteModel):
         choices=RatingIndikator.choices,
         null=True,
         blank=True,
+    )
+    import_batch = models.ForeignKey(
+        "imports.ImportBatch",
+        verbose_name="batch impor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="hasil_indikator",
+        editable=False,
     )
 
     history = HistoricalRecords()

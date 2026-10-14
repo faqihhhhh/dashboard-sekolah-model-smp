@@ -119,10 +119,11 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   selalu **dry-run + ringkasan** sebelum simpan; simpan dalam **satu transaksi**; batch tercatat dan **bisa di-rollback**; unggah ulang tidak
   menggandakan data. Kunci pencocokan: Sekolah = NPSN · Hasil Baseline = NPSN + periode · Surat = NPSN + jenis ·
   Intervensi = penyelenggara + pelaksana + judul + target mulai (atau kode kegiatan bila dipetakan). Token kosong bawaan: `#N/A`.
-- **Bentuk file baseline asli:** header **dua baris** (grup bergabung sel + kode), data mulai baris 3, 67 kolom: 10 profil, PM L3 (24), PM L2 (8),
+- **Bentuk file baseline asli:** header **dua baris** (grup bergabung sel + kode), data mulai baris 3, 71 kolom fisik (67 berisi data + 4 kosong): 10 profil, PM L3 (24), PM L2 (8),
   PM L1 (3), Skor PM, Profil PM, KKA L3 (10), KKA L2 (6), KKA L1 (2), Skor KKA, Profil KKA. Header digabung ` | `, mis. `PM Level 3 | 1.1.1`
   (kode `2.1` ada di PM dan KKA; grup yang membedakan). Rating: Pra-Berkembang, Berkembang, Maju, Unggul (null = Tidak Terkategori); ejaan “Pra Berkembang” /
   “Pra-Berkembang” / “Pra- Berkembang” sama artinya. Hasil indikator disimpan **format panjang** (sekolah, periode, kerangka, level, kode, rating).
+- Codebook di workbook memuat 56 node hierarki dan 35 indikator Level 3; sheet data memberi rating untuk 34 indikator Level 3 (136 uraian rubrik). Pertahankan codebook lengkap; indikator tanpa kolom rating tidak mendapat hasil sampai sumbernya menjelaskan pemetaan.
 - **Masalah data nyata yang harus tertangani (jangan diperbaiki diam-diam):** “Kab. Mimika” tertulis di provinsi “Papua” (kini Papua Tengah);
   “Kab. Klaten” tertulis di “D.I. Yogyakarta” (seharusnya Jawa Tengah); salah ketik “Kota Makasar”, “Kota Magelan”, “Kota Tarakan Barat”.
   Saran bagi Admin: petakan hanya kolom kab/kota dan biarkan provinsi diturunkan darinya.
@@ -165,6 +166,10 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] 2.4 laporan error `.xlsx`, riwayat batch, unduh file asli, tombol rollback
 - [ ] **Fase 3 — Baseline** — `HasilBaseline`, `KamusIndikator`, `HasilIndikator` (format panjang); impor lebar→panjang; donut PM/KKA; Panduan Indikator;
   detail sekolah + edit indikator; **komponen chart perkembangan generik** (dataset ber-`time_field`)
+  - [x] Model baseline dan relasi hierarki kamus indikator; skor tersimpan dengan presisi sumber
+  - [x] Kamus indikator dan panduan rating PM/KKA diekstrak dari workbook sumber; perintah `seed_baseline_reference` aman dijalankan ulang
+  - [ ] Impor baseline lebar→panjang dan validasi/dry-run
+  - [ ] UI panduan, detail/edit indikator, donut PM/KKA, dan chart perkembangan generik
 - [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
 - [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif

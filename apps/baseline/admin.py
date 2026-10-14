@@ -1,7 +1,7 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import HasilBaseline, HasilIndikator, KamusIndikator
+from .models import HasilBaseline, HasilIndikator, KamusIndikator, PanduanRating
 
 
 @admin.register(HasilBaseline)
@@ -23,6 +23,13 @@ class KamusIndikatorAdmin(admin.ModelAdmin):
     ordering = ("kerangka", "level", "urutan", "kode")
 
 
+@admin.register(PanduanRating)
+class PanduanRatingAdmin(admin.ModelAdmin):
+    list_display = ("indikator", "rating")
+    list_filter = ("indikator__kerangka", "rating")
+    search_fields = ("indikator__kode", "indikator__nama", "deskripsi")
+
+
 @admin.register(HasilIndikator)
 class HasilIndikatorAdmin(SimpleHistoryAdmin):
     list_display = ("hasil_baseline", "indikator", "rating", "deleted_at")
@@ -32,6 +39,7 @@ class HasilIndikatorAdmin(SimpleHistoryAdmin):
         "hasil_baseline__sekolah__nama",
         "indikator__kode",
     )
+    readonly_fields = ("import_batch",)
 
     def get_queryset(self, request):
         return HasilIndikator.all_objects.select_related("hasil_baseline__sekolah", "indikator")
