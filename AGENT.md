@@ -178,7 +178,11 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
 - [x] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
   - [x] Filter bersama untuk KPI dan tabel seluruh provinsi; endpoint agregat hanya mengirim hitungan publik
   - [x] Peta choropleth lokal tanpa CDN, dapat dipilih dengan mouse/keyboard; kode Papua hasil pemekaran dipetakan eksplisit dan dicocokkan ke kode Kemendagri
-- [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
+- [x] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
+  - [x] Model dua jenis dokumen per sekolah, berkas PDF privat atau tautan Google Drive, soft delete dan riwayat
+  - [x] Tabel sekolah sesuai kolom contoh; Guest hanya menerima status, Viewer+ membuka dokumen, Admin+ mengelola dokumen
+  - [x] Empat ringkasan kelengkapan dan grafik kumulatif berdasarkan waktu pencatatan aplikasi
+  - [ ] Verifikasi tampilan melalui browser dan operasional unggah/penyajian PDF di lingkungan Docker (belum dijalankan di sesi ini)
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif
 - [ ] **Fase 7 — Hardening dan deploy final** — rate limit login, header keamanan, audit dependensi, cadangan + uji restore, domain/HTTPS, README/runbook/panduan Admin, UAT
 - [ ] **Fase 8 — Setelah rilis** — Kurasi & RTL (butuh spesifikasi), ekspor, edit massal, MFA, analitik/prediksi (peran DB read-only, pandas; baru bermakna setelah beberapa periode)

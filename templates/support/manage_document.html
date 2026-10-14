@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Kelola Surat Dukungan{% endblock %}
+{% block content %}
+  <section class="page-head"><div><h1>Kelola Dokumen Surat</h1><p class="muted">{{ school.nama }} · {{ kind_label }}</p></div></section>
+  <section class="dashboard-card max-w-xl">
+    {% if previous_document %}
+      <div class="feature-notice"><span class="feature-notice-icon" aria-hidden="true">i</span><div><strong>Ada dokumen lama yang dihapus</strong><p>Super Admin dapat memulihkannya, atau Admin dapat menambahkan dokumen baru.</p></div></div>
+      {% if user.role == 'super_admin' %}<form method="post" class="support-remove-form">{% csrf_token %}<input type="hidden" name="action" value="pulihkan"><button class="button-outline button-compact" type="submit">Pulihkan dokumen sebelumnya</button></form>{% endif %}
+    {% endif %}
+    {% if document %}
+      <div class="feature-notice"><span class="feature-notice-icon" aria-hidden="true">i</span><div><strong>Dokumen saat ini tersedia</strong><p>Pengguna Viewer ke atas dapat membukanya dari tabel Surat Dukungan.</p></div></div>
+      <form method="post" class="support-remove-form">{% csrf_token %}<input type="hidden" name="action" value="hapus"><button class="button-danger button-compact" type="submit">Tandai belum tersedia</button></form>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" class="support-document-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="message message-error">{% for error in form.non_field_errors %}{{ error }}{% endfor %}</div>{% endif %}
+      {% include "components/form_fields.html" %}
+      <div class="form-actions"><button class="button-primary" type="submit">Simpan dokumen</button><a class="button-outline" href="{% url 'support:dashboard' %}">Batal</a></div>
+    </form>
+  </section>
+{% endblock %}

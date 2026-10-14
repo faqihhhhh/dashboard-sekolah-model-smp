@@ -41,10 +41,6 @@ def home_aggregate(request):
     )
 
 
-def surat_dukungan(request):
-    return render(request, "core/surat_dukungan.html")
-
-
 def healthz(request):
     """Dipakai Docker/Caddy/monitoring untuk memeriksa aplikasi dan database hidup."""
     try:

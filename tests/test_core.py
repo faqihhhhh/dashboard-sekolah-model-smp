@@ -102,15 +102,3 @@ def test_endpoint_agregat_publik_tidak_mengirim_data_sekolah(client, make_sekola
     assert school.nama.encode() not in response.content
     assert school.npsn.encode() not in response.content
     assert b"jumlah_guru" not in response.content
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize("role", [None, Role.VIEWER, Role.ADMIN, Role.SUPER_ADMIN])
-def test_surat_dukungan_menunjukkan_status_belum_tersedia(client, client_as, role):
-    current_client = client_as(role) if role else client
-    response = current_client.get(reverse("core:surat_dukungan"))
-
-    assert response.status_code == 200
-    assert b"Surat Dukungan" in response.content
-    assert b"Data surat belum tersedia" in response.content
-    assert b"Belum Unggah" not in response.content

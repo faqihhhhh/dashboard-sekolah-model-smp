@@ -7,6 +7,5 @@ app_name = "core"
 urlpatterns = [
     path("", views.home, name="home"),
     path("api/agregat/sekolah/", views.home_aggregate, name="home_aggregate"),
-    path("surat-dukungan/", views.surat_dukungan, name="surat_dukungan"),
     path("healthz", views.healthz, name="healthz"),
 ]

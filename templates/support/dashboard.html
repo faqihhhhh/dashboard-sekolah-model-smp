@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Surat Dukungan{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Surat Dukungan</h1>
+      <p class="muted">Rekap surat rekomendasi dan dukungan, serta kesiapan dan komitmen satuan pendidikan.</p>
+    </div>
+    {% if can_edit %}<span class="card-tag">Kelola dokumen melalui tautan Kelola di tabel</span>{% endif %}
+  </section>
+
+  <section class="support-summary-grid" aria-label="Ringkasan kelengkapan surat">
+    {% for item in summaries %}
+      <article class="dashboard-card support-summary">
+        <h2 class="{% if item.tone == 'green' %}partner{% endif %}">{{ item.title }}</h2>
+        <div class="support-donut" style="--completion: {{ item.percent }}%" role="img" aria-label="{{ item.percent }} persen surat tersedia">
+          <div><strong>{{ item.percent }}%</strong><small>{{ item.available }} dari {{ item.eligible }}</small></div>
+        </div>
+        <p>{{ item.description }}</p>
+        <div class="stat-subs support-counts"><span>Sudah: {{ item.available }}</span><span>Belum: {{ item.missing }}</span></div>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="dashboard-card trend-card support-trend-card">
+    <div><h2>Perkembangan dokumen</h2><p class="muted">Jumlah PDF atau tautan yang tercatat di aplikasi secara kumulatif, menurut waktu pencatatan.</p></div>
+    {% if chart.empty %}
+      <p class="muted">Grafik akan muncul setelah dokumen pertama dicatat.</p>
+    {% else %}
+      <figure class="trend-chart">
+        <svg viewBox="0 0 100 108" role="img" aria-label="Grafik kumulatif dokumen yang dicatat di aplikasi">
+          <path class="trend-gridline" d="M0 10H100 M0 50H100 M0 90H100" />
+          {% for line in chart.lines %}<polyline fill="none" stroke="{{ line.color }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" points="{{ line.points }}" />{% endfor %}
+          {% for label in chart.labels %}<text x="{{ label.x }}" y="105">{{ label.label }}</text>{% endfor %}
+        </svg>
+        <ul class="trend-legend">{% for line in chart.lines %}<li><span style="background:{{ line.color }}"></span>{{ line.name }}</li>{% endfor %}</ul>
+      </figure>
+    {% endif %}
+  </section>
+
+  <form method="get" class="dashboard-card support-filters" aria-label="Filter daftar surat">
+    <label>Cari sekolah atau NPSN<input class="filter-control" type="search" name="q" value="{{ q }}" placeholder="Nama sekolah atau NPSN"></label>
+    <label>Provinsi<select class="filter-control" name="provinsi"><option value="">Semua provinsi</option>{% for item in province_options %}<option value="{{ item.kode }}"{% if selected_province == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}</select></label>
+    <label>Usulan<select class="filter-control" name="pengusul"><option value="">Semua usulan</option>{% for value, label in proposer_options %}<option value="{{ value }}"{% if selected_proposer == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <div><button class="button-primary" type="submit">Terapkan</button><a class="button-outline" href="{% url 'support:dashboard' %}">Reset</a></div>
+  </form>
+
+  <section class="dashboard-card support-table-card">
+    <div class="card-heading">
+      <div><h3>Daftar sekolah — kelengkapan surat dukungan</h3><p class="muted">“Lihat” membuka PDF atau tautan dokumen bagi pengguna berizin.</p></div>
+      <span class="card-tag">{{ rows|length }} sekolah</span>
+    </div>
+    <div class="support-table-wrap">
+      <table class="support-table">
+        <thead><tr><th>No</th><th>NPSN</th><th>Nama Sekolah</th><th>Provinsi</th><th>Kabupaten/Kota</th><th>Usulan</th><th>Surat Rekomendasi<br>&amp; Dukungan</th><th>Surat Kesiapan<br>&amp; Komitmen Satuan</th></tr></thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td>{{ forloop.counter }}</td><td>{{ row.school.npsn }}</td><td>{{ row.school.nama }}</td>
+              <td>{{ row.school.provinsi.nama }}</td><td>{{ row.school.kabkota.nama }}</td>
+              <td>{% if row.school.pengusul == 'dinas' %}Dinas{% else %}Mitra{% endif %}</td>
+              {% for document in row.documents %}
+                <td>
+                  {% if document.url %}<a class="link" href="{{ document.url }}">Lihat</a>
+                  {% elif document.available %}<span class="badge badge-green">Sudah tersedia</span>
+                  {% else %}<span class="badge badge-slate">Belum tersedia</span>{% endif %}
+                  {% if document.manage_url %}<a class="support-manage-link" href="{{ document.manage_url }}">Kelola</a>{% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="8" class="empty-cell">Tidak ada sekolah yang cocok dengan filter.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

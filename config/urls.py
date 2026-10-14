@@ -8,5 +8,6 @@ urlpatterns = [
     path("", include("apps.sekolah.urls")),
     path("", include("apps.imports.urls")),
     path("", include("apps.baseline.urls")),
+    path("", include("apps.support.urls")),
     path("", include("apps.core.urls")),
 ]
