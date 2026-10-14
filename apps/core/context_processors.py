@@ -23,7 +23,7 @@ NAV = [
             NavItem("Daftar Sekolah", "sekolah:list"),
             NavItem("Riwayat Impor", "imports:history", Role.ADMIN),
             NavItem("Surat Dukungan", "core:surat_dukungan"),
-            NavItem("Baseline Sekolah"),
+            NavItem("Baseline Sekolah", "baseline:dashboard"),
         ],
     ),
     (

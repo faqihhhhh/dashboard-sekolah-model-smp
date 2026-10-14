@@ -245,6 +245,43 @@ button, input, select, textarea { font-family: inherit; }
 .batch-metrics dd { margin: 4px 0 0; color: #0f172a; font-size: 20px; font-weight: 800; }
 .rollback-panel { display: grid; gap: 12px; border-color: #fecaca; }
 .rollback-panel h2 { margin: 0; color: #991b1b; font-size: 16px; }
+.page-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.baseline-donut-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.baseline-donut-card { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 12px 18px; align-items: center; }
+.baseline-donut-card h2, .baseline-list-card h2, .indicator-detail-card h2 { margin: 0; color: #0f172a; font-size: 16px; font-weight: 750; }
+.baseline-donut-card p { margin: 4px 0 0; }
+.baseline-donut { display: grid; width: 140px; aspect-ratio: 1; place-items: center; border-radius: 50%; position: relative; }
+.baseline-donut::before { content: ""; position: absolute; inset: 19px; border-radius: 50%; background: #fff; }
+.baseline-donut > span { z-index: 1; color: #0f172a; font-size: 21px; font-weight: 800; }
+.baseline-legend { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; padding: 0; list-style: none; }
+.baseline-legend li { display: flex; align-items: center; gap: 7px; color: #475569; font-size: 11px; }
+.baseline-legend strong { margin-left: auto; color: #0f172a; }
+.legend-dot { width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; }
+.baseline-list-card, .indicator-detail-card { display: grid; gap: 14px; }
+.search-bar { display: flex; gap: 8px; max-width: 520px; }
+.pagination { display: flex; justify-content: space-between; gap: 12px; padding: 12px 2px 0; color: #64748b; font-size: 12px; }
+.pagination a { color: #1d4ed8; font-weight: 650; }
+.baseline-summary { margin-bottom: 16px; }
+.baseline-profile dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; }
+.baseline-profile dl > div { padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.baseline-profile dt { color: #64748b; font-size: 11px; }
+.baseline-profile dd { margin: 3px 0 0; color: #1e293b; font-size: 13px; }
+.indicator-framework-heading { margin: 16px 0 0; color: #1d4ed8; font-size: 14px; }
+.guide-framework { display: grid; gap: 12px; }
+.guide-framework h2 { margin: 0; color: #0f172a; font-size: 17px; }
+.guide-indicator { display: grid; gap: 10px; padding: 14px 0; border-top: 1px solid #e2e8f0; }
+.guide-path { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: #64748b; font-size: 11px; }
+.guide-path span { padding: 4px 7px; border-radius: 5px; background: #f1f5f9; }
+.guide-path strong { color: #0f172a; }
+.guide-rating-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.guide-rating-grid > div { padding: 11px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
+.guide-rating-grid strong { color: #334155; font-size: 12px; }
+.guide-rating-grid p { margin: 5px 0 0; color: #64748b; font-size: 11px; line-height: 1.55; }
+.indicator-detail-card details summary { color: #1d4ed8; font-size: 11px; cursor: pointer; }
+.indicator-detail-card details p { max-width: 440px; color: #64748b; font-size: 11px; line-height: 1.5; }
+.empty-state { text-align: center; }
+.empty-state h2 { margin: 0 0 5px; color: #0f172a; font-size: 17px; }
+.empty-state p { margin: 0; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid rgb(59 130 246 / 35%);
   outline-offset: 2px;
@@ -270,6 +307,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .dashboard-head h1, .page-head h1 { font-size: 22px; }
   .dashboard-hero { padding: 22px 20px; }
   .dashboard-hero h2 { font-size: 19px; }
+  .baseline-donut-grid, .guide-rating-grid { grid-template-columns: 1fr; }
+  .baseline-donut-card { grid-template-columns: minmax(0, 1fr) 116px; }
+  .baseline-donut { width: 108px; }
+  .baseline-donut::before { inset: 15px; }
+  .baseline-profile dl { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
   .stats-grid, .support-summary-grid { grid-template-columns: 1fr; }

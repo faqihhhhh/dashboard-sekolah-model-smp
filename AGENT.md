@@ -172,7 +172,9 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Dry-run baseline memvalidasi pemetaan, NPSN, sekolah, periode, skor/profil, rating, dan pembaruan tanpa menulis DB
   - [x] Commit transaksional dengan riwayat, atribusi batch, serta rollback ringkasan dan indikator
   - [x] Wizard Admin unggah → pilih sheet/header → pemetaan manual → dry-run → alias rating → commit; batch muncul di riwayat impor
-  - [ ] UI panduan, detail/edit indikator, donut PM/KKA, dan chart perkembangan generik
+  - [x] Dashboard agregat dan donut PM/KKA; Guest tidak menerima data sekolah
+  - [x] Panduan indikator publik; detail hasil untuk Viewer+; edit rating ber-riwayat untuk Admin+
+  - [ ] Komponen chart perkembangan generik lintas periode
 - [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
 - [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif

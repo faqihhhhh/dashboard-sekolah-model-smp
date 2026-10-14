@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Baseline Sekolah{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Baseline Sekolah</h1>
+      <p class="muted">Ringkasan hasil Pembelajaran Mendalam dan Koding & Kecerdasan Artifisial.</p>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'baseline:guide' %}" class="button-outline">Panduan indikator</a>
+      {% if user.is_authenticated and user.role == "admin" or user.is_authenticated and user.role == "super_admin" %}
+        <a href="{% url 'baseline:import_wizard' %}" class="button-primary">Impor baseline</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <form method="get" class="dashboard-card filter-bar">
+    <label>Periode baseline
+      <select name="periode" class="filter-control" onchange="this.form.submit()">
+        {% for item in periods %}<option value="{{ item.pk }}"{% if period.pk == item.pk %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
+      </select>
+    </label>
+  </form>
+
+  {% if period %}
+    <div class="kpi-grid">
+      <article class="dashboard-card kpi-card"><span class="muted">Sekolah dengan data</span><strong>{{ baseline_count }}</strong><span class="muted">Periode {{ period.nama }}</span></article>
+      <article class="dashboard-card kpi-card"><span class="muted">Tipe indikator</span><strong>2</strong><span class="muted">PM dan KKA</span></article>
+    </div>
+
+    <div class="baseline-donut-grid">
+      {% for donut in donuts %}
+        <section class="dashboard-card baseline-donut-card">
+          <div>
+            <h2>{{ donut.label }}</h2>
+            <p class="muted">Komposisi dari {{ donut.expected }} kesempatan rating</p>
+          </div>
+          {% if donut.expected %}
+            <div class="baseline-donut" style="background: {{ donut.gradient }}" role="img" aria-label="Diagram rating {{ donut.label }}">
+              <span>{{ donut.expected }}</span>
+            </div>
+            <ul class="baseline-legend">
+              {% for segment in donut.segments %}
+                <li><span class="legend-dot" style="background: {{ segment.color }}"></span>{{ segment.label }}<strong>{{ segment.count }}</strong></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="muted">Belum ada hasil untuk divisualisasikan.</p>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
+
+    {% if is_viewer %}
+      <section class="dashboard-card baseline-list-card">
+        <div class="card-heading"><div><h2>Hasil per sekolah</h2><p class="muted">Data ini hanya tersedia untuk pengguna yang sudah masuk.</p></div></div>
+        <form method="get" class="search-bar">
+          <input type="hidden" name="periode" value="{{ period.pk }}">
+          <input name="q" value="{{ query }}" placeholder="Cari nama sekolah atau NPSN" class="filter-control">
+          <button class="button-outline" type="submit">Cari</button>
+        </form>
+        <div class="import-table-wrap"><table class="import-table">
+          <thead><tr><th>NPSN</th><th>Nama sekolah</th><th>Kabupaten/kota</th><th>Skor PM</th><th>Profil PM</th><th>Skor KKA</th><th>Profil KKA</th><th></th></tr></thead>
+          <tbody>
+            {% for row in page_obj %}
+              <tr>
+                <td>{{ row.sekolah.npsn }}</td><td>{{ row.sekolah.nama }}</td><td>{{ row.sekolah.kabkota.nama }}</td>
+                <td>{{ row.skor_pm|default:"—" }}</td><td>{{ row.profil_pm|default:"—" }}</td>
+                <td>{{ row.skor_kka|default:"—" }}</td><td>{{ row.profil_kka|default:"—" }}</td>
+                <td><a class="button-outline button-compact" href="{% url 'baseline:detail' row.pk %}">Detail</a></td>
+              </tr>
+            {% empty %}<tr><td colspan="8" class="text-center text-slate-400">Belum ada data baseline.</td></tr>{% endfor %}
+          </tbody>
+        </table></div>
+        {% if page_obj.has_other_pages %}
+          <nav class="pagination" aria-label="Halaman hasil baseline">
+            {% if page_obj.has_previous %}<a href="?periode={{ period.pk }}&q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}">Sebelumnya</a>{% endif %}
+            <span>Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a href="?periode={{ period.pk }}&q={{ query|urlencode }}&page={{ page_obj.next_page_number }}">Berikutnya</a>{% endif %}
+          </nav>
+        {% endif %}
+      </section>
+    {% else %}
+      <div class="message message-info">Masuk sebagai Viewer atau lebih tinggi untuk melihat hasil per sekolah.</div>
+    {% endif %}
+  {% else %}
+    <section class="dashboard-card empty-state"><h2>Periode baseline belum tersedia</h2><p class="muted">Super Admin dapat menambahkan periode melalui menu Periode.</p></section>
+  {% endif %}
+{% endblock %}

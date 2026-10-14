@@ -5,10 +5,13 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files import File
+from django.core.paginator import Paginator
+from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.http import HttpResponseBadRequest
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
@@ -32,7 +35,14 @@ from .importing import (
     commit_baseline_preview,
     run_baseline_dry_run,
 )
-from .models import KamusIndikator, LevelIndikator, RatingIndikator
+from .models import (
+    HasilBaseline,
+    HasilIndikator,
+    KamusIndikator,
+    Kerangka,
+    LevelIndikator,
+    RatingIndikator,
+)
 
 SESSION_KEY = "baseline_import_wizard"
 STEPS = (
@@ -350,3 +360,198 @@ def import_wizard(request):
         return _render(request, state, error=str(exc))
 
     return _render(request, state)
+
+
+RATING_COLORS = {
+    RatingIndikator.PRA_BERKEMBANG: "#f97316",
+    RatingIndikator.BERKEMBANG: "#eab308",
+    RatingIndikator.MAJU: "#22c55e",
+    RatingIndikator.UNGGUL: "#2563eb",
+}
+
+
+def _baseline_donut(period, framework):
+    baselines = HasilBaseline.objects.filter(periode=period)
+    baseline_count = baselines.count()
+    rated_indicators = KamusIndikator.objects.filter(
+        kerangka=framework,
+        level=LevelIndikator.L3,
+        aktif=True,
+        panduan_rating__isnull=False,
+    ).distinct()
+    expected = baseline_count * rated_indicators.count()
+    results = HasilIndikator.objects.filter(
+        hasil_baseline__in=baselines, indikator__in=rated_indicators
+    )
+    counts = {
+        rating: results.filter(rating=rating).count() for rating, _label in RatingIndikator.choices
+    }
+    not_categorized = results.filter(rating__isnull=True).count()
+    recorded = sum(counts.values()) + not_categorized
+    missing = max(expected - recorded, 0)
+    total = expected
+    segments = [
+        {
+            "label": label,
+            "count": counts[value],
+            "color": RATING_COLORS[value],
+        }
+        for value, label in RatingIndikator.choices
+    ]
+    segments.extend(
+        [
+            {"label": "Tidak terkategori", "count": not_categorized, "color": "#64748b"},
+            {"label": "Belum diisi", "count": missing, "color": "#e2e8f0"},
+        ]
+    )
+    angle = 0.0
+    gradient_parts = []
+    if total:
+        for segment in segments:
+            next_angle = angle + segment["count"] * 360 / total
+            gradient_parts.append(f"{segment['color']} {angle:.2f}deg {next_angle:.2f}deg")
+            angle = next_angle
+    donut = {
+        "framework": framework,
+        "label": dict(Kerangka.choices)[framework],
+        "expected": expected,
+        "segments": segments,
+        "gradient": "conic-gradient(" + ", ".join(gradient_parts) + ")" if total else "",
+    }
+    return donut
+
+
+def dashboard(request):
+    periods = Periode.objects.filter(jenis=JenisPeriode.BASELINE)
+    selected_id = request.GET.get("periode", "")
+    period = periods.filter(pk=selected_id).first() if selected_id else periods.last()
+    is_viewer = has_role(request.user, Role.VIEWER)
+    context = {
+        "periods": periods,
+        "period": period,
+        "is_viewer": is_viewer,
+        "donuts": [],
+        "baseline_count": 0,
+    }
+    if period:
+        baselines = HasilBaseline.objects.filter(periode=period).select_related(
+            "sekolah", "sekolah__provinsi", "sekolah__kabkota"
+        )
+        context["baseline_count"] = baselines.count()
+        context["donuts"] = [
+            _baseline_donut(period, framework) for framework in (Kerangka.PM, Kerangka.KKA)
+        ]
+        if is_viewer:
+            query = request.GET.get("q", "").strip()
+            if query:
+                baselines = baselines.filter(
+                    Q(sekolah__npsn__icontains=query) | Q(sekolah__nama__icontains=query)
+                )
+            context["query"] = query
+            context["page_obj"] = Paginator(baselines, 25).get_page(request.GET.get("page"))
+    return render(request, "baseline/dashboard.html", context)
+
+
+def indicator_guide(request):
+    indicators = (
+        KamusIndikator.objects.filter(aktif=True, level=LevelIndikator.L3)
+        .select_related("parent", "parent__parent")
+        .prefetch_related("panduan_rating")
+        .order_by("kerangka", "urutan", "kode")
+    )
+    return render(request, "baseline/guide.html", {"indicators": indicators})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def detail(request, pk):
+    if not has_role(request.user, Role.VIEWER):
+        raise PermissionDenied
+    baseline = get_object_or_404(HasilBaseline.objects.select_related("sekolah", "periode"), pk=pk)
+    is_admin = has_role(request.user, Role.ADMIN)
+    indicators = list(
+        KamusIndikator.objects.filter(aktif=True, level=LevelIndikator.L3)
+        .select_related("parent", "parent__parent")
+        .prefetch_related("panduan_rating")
+        .order_by("kerangka", "urutan", "kode")
+    )
+    all_results = {
+        item.indikator_id: item
+        for item in HasilIndikator.all_objects.filter(hasil_baseline=baseline)
+    }
+    results = {pk: item for pk, item in all_results.items() if not item.is_deleted}
+    if request.method == "POST":
+        if not is_admin:
+            raise PermissionDenied
+        updates = []
+        for indicator in indicators:
+            value = request.POST.get(f"rating_{indicator.pk}", "")
+            if value and value not in RatingIndikator.values:
+                messages.error(
+                    request, "Ada rating yang tidak valid. Tidak ada perubahan disimpan."
+                )
+                return redirect("baseline:detail", pk=baseline.pk)
+            existing = results.get(indicator.pk)
+            deleted_result = all_results.get(indicator.pk)
+            if (
+                existing is None
+                and deleted_result is not None
+                and deleted_result.is_deleted
+                and value
+            ):
+                messages.error(
+                    request,
+                    "Hasil indikator terhapus harus dipulihkan terlebih dahulu. "
+                    "Tidak ada perubahan disimpan.",
+                )
+                return redirect("baseline:detail", pk=baseline.pk)
+            if existing is None and not value:
+                continue
+            if existing is None or existing.rating != (value or None):
+                updates.append((indicator, existing, value or None))
+        try:
+            with transaction.atomic():
+                locked_baseline = HasilBaseline.objects.select_for_update().get(pk=baseline.pk)
+                for indicator, existing, value in updates:
+                    if existing is None:
+                        result = HasilIndikator(
+                            hasil_baseline=locked_baseline,
+                            indikator=indicator,
+                            rating=value,
+                        )
+                    else:
+                        result = HasilIndikator.all_objects.select_for_update().get(pk=existing.pk)
+                        if result.is_deleted:
+                            raise ValueError(
+                                "Hasil indikator terhapus harus dipulihkan terlebih dahulu."
+                            )
+                        result.rating = value
+                    result.full_clean()
+                    result._history_user = request.user
+                    result._change_reason = request.POST.get("reason", "Ubah rating baseline")[:100]
+                    result.save()
+        except (ValidationError, ValueError, IntegrityError, HasilIndikator.DoesNotExist) as error:
+            messages.error(request, f"Perubahan gagal disimpan: {error}")
+        else:
+            messages.success(request, f"{len(updates)} rating baseline disimpan.")
+        return redirect("baseline:detail", pk=baseline.pk)
+
+    rows = [
+        {
+            "indicator": indicator,
+            "result": results.get(indicator.pk),
+            "deleted": bool(all_results.get(indicator.pk) and all_results[indicator.pk].is_deleted),
+            "guides": list(indicator.panduan_rating.all()),
+        }
+        for indicator in indicators
+    ]
+    return render(
+        request,
+        "baseline/detail.html",
+        {
+            "baseline": baseline,
+            "rows": rows,
+            "is_admin": is_admin,
+            "rating_choices": RatingIndikator.choices,
+        },
+    )

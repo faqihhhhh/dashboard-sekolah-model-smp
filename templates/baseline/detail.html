@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Baseline {{ baseline.sekolah.nama }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>{{ baseline.sekolah.nama }}</h1>
+      <p class="muted">NPSN {{ baseline.sekolah.npsn }} · {{ baseline.sekolah.kabkota.nama }} · {{ baseline.periode.nama }}</p>
+    </div>
+    <a href="{% url 'baseline:dashboard' %}?periode={{ baseline.periode_id }}" class="button-outline">Kembali ke daftar</a>
+  </section>
+  <div class="kpi-grid baseline-summary">
+    <article class="dashboard-card kpi-card"><span class="muted">Skor PM</span><strong>{{ baseline.skor_pm|default:"—" }}</strong><span>{{ baseline.profil_pm|default:"Belum ada profil" }}</span></article>
+    <article class="dashboard-card kpi-card"><span class="muted">Skor KKA</span><strong>{{ baseline.skor_kka|default:"—" }}</strong><span>{{ baseline.profil_kka|default:"Belum ada profil" }}</span></article>
+  </div>
+  {% if baseline.profil_data %}
+    <section class="dashboard-card baseline-profile"><h2>Data profil</h2><dl>
+      {% for key, value in baseline.profil_data.items %}<div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>{% endfor %}
+    </dl></section>
+  {% endif %}
+
+  <section class="dashboard-card indicator-detail-card">
+    <div class="card-heading"><div><h2>Rating indikator Level 3</h2><p class="muted">Uraian rubrik tersedia di Panduan Indikator.</p></div><a href="{% url 'baseline:guide' %}" class="button-outline">Buka panduan</a></div>
+    {% if is_admin %}<form method="post" class="import-form">{% csrf_token %}{% endif %}
+    {% regroup rows by indicator.get_kerangka_display as framework_groups %}
+    {% for group in framework_groups %}
+      <h3 class="indicator-framework-heading">{{ group.grouper }}</h3>
+      <div class="import-table-wrap"><table class="import-table">
+        <thead><tr><th>Kode</th><th>Indikator</th><th>Induk</th><th>Rating</th><th>Rubrik</th></tr></thead>
+        <tbody>
+          {% for row in group.list %}
+            <tr>
+              <td>{{ row.indicator.kode }}</td><td>{{ row.indicator.nama }}</td><td>{{ row.indicator.parent.nama }}</td>
+              <td>
+                {% if is_admin %}
+                  <select name="rating_{{ row.indicator.pk }}" class="filter-control"{% if row.deleted %} disabled{% endif %}>
+                    <option value="">Belum diisi</option>
+                    {% for value, label in rating_choices %}<option value="{{ value }}"{% if row.result.rating == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                  {% if row.deleted %}<span class="muted">Hasil terhapus perlu dipulihkan</span>{% endif %}
+                {% elif row.result %}{{ row.result.get_rating_display|default:"Tidak terkategori" }}{% else %}<span class="muted">Belum diisi</span>{% endif %}
+              </td>
+              <td>{% for guide in row.guides %}<details><summary>{{ guide.get_rating_display }}</summary><p>{{ guide.deskripsi }}</p></details>{% empty %}<span class="muted">—</span>{% endfor %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% endfor %}
+    {% if is_admin %}<div class="import-actions"><label>Alasan perubahan<input name="reason" maxlength="100" value="Ubah rating baseline" class="filter-control"></label><button class="button-primary" type="submit">Simpan rating</button></div></form>{% endif %}
+  </section>
+{% endblock %}

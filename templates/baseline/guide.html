@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Panduan Indikator Baseline{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div><h1>Panduan Indikator</h1><p class="muted">Struktur dan rubrik rating dari codebook baseline.</p></div>
+    <a href="{% url 'baseline:dashboard' %}" class="button-outline">Kembali ke baseline</a>
+  </section>
+  {% regroup indicators by get_kerangka_display as framework_groups %}
+  {% for group in framework_groups %}
+    <section class="dashboard-card guide-framework">
+      <h2>{{ group.grouper }}</h2>
+      {% for indicator in group.list %}
+        <article class="guide-indicator">
+          <div class="guide-path"><span>{{ indicator.parent.parent.nama }}</span><span>{{ indicator.parent.nama }}</span><strong>{{ indicator.kode }} · {{ indicator.nama }}</strong></div>
+          {% if indicator.panduan_rating.all %}
+            <div class="guide-rating-grid">
+              {% for guide in indicator.panduan_rating.all %}
+                <div><strong>{{ guide.get_rating_display }}</strong><p>{{ guide.deskripsi }}</p></div>
+              {% endfor %}
+            </div>
+          {% else %}<p class="muted">Rubrik rating belum tersedia pada workbook sumber.</p>{% endif %}
+        </article>
+      {% empty %}<p class="muted">Belum ada indikator untuk kerangka ini.</p>{% endfor %}
+    </section>
+  {% empty %}<section class="dashboard-card"><p class="muted">Kamus indikator belum diisi.</p></section>{% endfor %}
+{% endblock %}

@@ -4,7 +4,15 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from apps.baseline.models import HasilBaseline, KamusIndikator, Kerangka, LevelIndikator
+from apps.baseline.models import (
+    HasilBaseline,
+    HasilIndikator,
+    KamusIndikator,
+    Kerangka,
+    LevelIndikator,
+    PanduanRating,
+    RatingIndikator,
+)
 from apps.referensi.models import Periode
 
 
@@ -88,3 +96,77 @@ def test_admin_dapat_upload_pemetaan_dry_run_dan_commit_baseline(
 
     assert response.context["stage"] == "done"
     assert HasilBaseline.objects.filter(sekolah=school, periode=period).exists()
+
+
+@pytest.mark.django_db
+def test_guest_hanya_menerima_agregat_baseline(make_sekolah, client):
+    school = make_sekolah(nama="SMP Data Terbatas")
+    period = Periode.objects.create(
+        nama="Baseline Publik", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Indikator contoh",
+    )
+    PanduanRating.objects.create(
+        indikator=indicator,
+        rating=RatingIndikator.MAJU,
+        deskripsi="Panduan rating yang bersifat publik.",
+    )
+    baseline = HasilBaseline.objects.create(sekolah=school, periode=period)
+    HasilIndikator.objects.create(
+        hasil_baseline=baseline, indikator=indicator, rating=RatingIndikator.MAJU
+    )
+
+    response = client.get(reverse("baseline:dashboard"), {"periode": period.pk})
+
+    assert response.status_code == 200
+    assert b"SMP Data Terbatas" not in response.content
+    assert school.npsn.encode() not in response.content
+    assert response.context["baseline_count"] == 1
+    assert b"Masuk sebagai Viewer" in response.content
+
+
+@pytest.mark.django_db
+def test_detail_baseline_dan_edit_rating_dibatasi_peran(make_sekolah, make_user, client):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Akses Detail", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    indicator = KamusIndikator.objects.create(
+        kerangka=Kerangka.PM,
+        level=LevelIndikator.L3,
+        kode="1.1.1",
+        nama="Indikator contoh",
+    )
+    baseline = HasilBaseline.objects.create(sekolah=school, periode=period)
+    result = HasilIndikator.objects.create(
+        hasil_baseline=baseline, indikator=indicator, rating=RatingIndikator.MAJU
+    )
+    url = reverse("baseline:detail", args=[baseline.pk])
+
+    assert client.get(url).status_code == 302
+    client.force_login(make_user("viewer"))
+    assert client.get(url).status_code == 200
+    assert client.post(url, {f"rating_{indicator.pk}": "unggul"}).status_code == 403
+
+    admin = make_user("admin")
+    client.force_login(admin)
+    response = client.post(
+        url,
+        {f"rating_{indicator.pk}": "unggul", "reason": "Koreksi setelah verifikasi"},
+    )
+    assert response.status_code == 302
+    result.refresh_from_db()
+    assert result.rating == RatingIndikator.UNGGUL
+    assert result.history.first().history_user == admin
+
+
+@pytest.mark.django_db
+def test_panduan_indikator_dapat_dibaca_guest(client):
+    response = client.get(reverse("baseline:guide"))
+
+    assert response.status_code == 200
+    assert b"Panduan Indikator" in response.content
