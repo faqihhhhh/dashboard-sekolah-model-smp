@@ -364,10 +364,10 @@ def import_wizard(request):
 
 
 RATING_COLORS = {
-    RatingIndikator.PRA_BERKEMBANG: "#b9794b",
-    RatingIndikator.BERKEMBANG: "#c2a25b",
-    RatingIndikator.MAJU: "#78936d",
-    RatingIndikator.UNGGUL: "#3e6d5b",
+    RatingIndikator.PRA_BERKEMBANG: "#c56f2f",
+    RatingIndikator.BERKEMBANG: "#d9ad79",
+    RatingIndikator.MAJU: "#79b3d2",
+    RatingIndikator.UNGGUL: "#3d7fa4",
 }
 
 
@@ -473,8 +473,8 @@ def detail(request, pk):
         HasilBaseline.objects.filter(sekolah=baseline.sekolah).select_related("periode"),
         time_field="periode",
         value_fields=(
-            ("skor_pm", "Skor PM", "#547a61"),
-            ("skor_kka", "Skor KKA", "#a27a4d"),
+            ("skor_pm", "Skor PM", "#4386ad"),
+            ("skor_kka", "Skor KKA", "#c56f2f"),
         ),
     )
     is_admin = has_role(request.user, Role.ADMIN)
