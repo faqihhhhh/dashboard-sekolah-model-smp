@@ -19,6 +19,31 @@
     </div>
   </section>
 
+  <form method="get" class="dashboard-card home-filters" aria-label="Filter ringkasan sekolah">
+    <label>Provinsi
+      <select name="provinsi" class="filter-control">
+        <option value="">Semua provinsi</option>
+        {% for item in provinsi_options %}<option value="{{ item.pk }}"{% if filters.provinsi == item.pk %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Status sekolah
+      <select name="status" class="filter-control"><option value="">Semua status</option>
+        {% for value, label in status_options %}<option value="{{ value }}"{% if filters.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Pengusul
+      <select name="pengusul" class="filter-control"><option value="">Semua pengusul</option>
+        {% for value, label in pengusul_options %}<option value="{{ value }}"{% if filters.pengusul == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Mapel KKA
+      <select name="mapel_kka" class="filter-control"><option value="">Semua status</option>
+        {% for value, label in mapel_options %}<option value="{{ value }}"{% if filters.mapel_kka == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <div><button class="button-primary" type="submit">Terapkan filter</button><a class="button-outline" href="{% url 'core:home' %}">Reset</a></div>
+  </form>
+
   <section class="stats-grid" aria-label="Ringkasan sekolah">
     <article class="dashboard-card">
       <div class="stat-top"><span class="stat-label">Total sekolah</span><span class="stat-icon" aria-hidden="true">▦</span></div>
@@ -45,12 +70,12 @@
   <section class="dashboard-grid">
     <article class="dashboard-card">
       <div class="card-heading">
-        <div><h3>Sekolah per provinsi</h3><p class="muted">Sepuluh provinsi dengan jumlah sekolah terbanyak.</p></div>
+        <div><h3>Sekolah per provinsi</h3><p class="muted">Jumlah sekolah pada setiap provinsi dengan filter yang dipilih.</p></div>
         <span class="card-tag">Nasional</span>
       </div>
       <div class="province-heading"><span>PROVINSI</span><span>SEKOLAH</span></div>
       {% for item in provinsi %}
-        <div class="province-row"><span>{{ item.provinsi__nama }}</span><span class="province-count">{{ item.total }}</span></div>
+        <div class="province-row"><span>{{ item.nama }}</span><span class="province-count">{{ item.total }}</span></div>
       {% empty %}
         <div class="empty-state">Belum ada data sekolah. Ringkasan akan muncul setelah data dimasukkan.</div>
       {% endfor %}
@@ -59,8 +84,8 @@
 
     <div class="dashboard-stack">
       <article class="dashboard-card">
-        <div class="card-heading"><div><h3>Baseline kesiapan sekolah</h3><p class="muted">Perkembangan hasil pengukuran.</p></div><span class="card-tag">Segera</span></div>
-        <div class="empty-state">Data baseline belum tersedia karena modul dan model datanya belum dibangun.</div>
+        <div class="card-heading"><div><h3>Baseline kesiapan sekolah</h3><p class="muted">Ringkasan hasil pengukuran.</p></div><span class="card-tag">{{ baseline_count }} sekolah</span></div>
+        <div class="province-action"><a class="button-outline" href="{% url 'baseline:dashboard' %}">Buka ringkasan baseline <span aria-hidden="true">→</span></a></div>
       </article>
       <article class="dashboard-card">
         <div class="card-heading"><div><h3>Modul program</h3><p class="muted">Data terhubung akan ditampilkan di sini.</p></div></div>

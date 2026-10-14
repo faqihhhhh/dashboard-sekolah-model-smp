@@ -176,6 +176,8 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Panduan indikator publik; detail hasil untuk Viewer+; edit rating ber-riwayat untuk Admin+
   - [x] Komponen SVG perkembangan generik berdasarkan field waktu; detail sekolah menampilkan tren skor lintas periode
 - [ ] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
+  - [x] Filter bersama untuk KPI dan tabel seluruh provinsi; endpoint agregat hanya mengirim hitungan publik
+  - [ ] Peta choropleth; menunggu sumber GeoJSON 38 provinsi yang lisensinya terverifikasi
 - [ ] **Fase 5 — Surat Dukungan** — tautan Drive + unggah PDF (≤10 MB, akses berizin), 4 donut kelengkapan, chart kumulatif
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif
 - [ ] **Fase 7 — Hardening dan deploy final** — rate limit login, header keamanan, audit dependensi, cadangan + uji restore, domain/HTTPS, README/runbook/panduan Admin, UAT

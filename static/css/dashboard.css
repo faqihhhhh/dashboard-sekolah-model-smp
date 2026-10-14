@@ -297,6 +297,11 @@ button, input, select, textarea { font-family: inherit; }
 .trend-values ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .trend-values li { display: flex; gap: 7px; padding: 5px 8px; border-radius: 6px; background: #f8fafc; color: #64748b; font-size: 10px; }
 .trend-values strong { color: #0f172a; }
+.home-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 12px; align-items: end; margin-bottom: 16px; }
+.home-filters label { display: grid; gap: 6px; color: #475569; font-size: 11px; font-weight: 650; }
+.home-filters > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.province-row { gap: 12px; }
+.province-row > span:first-child { min-width: 0; overflow-wrap: anywhere; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid rgb(59 130 246 / 35%);
   outline-offset: 2px;
@@ -327,6 +332,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .baseline-donut { width: 108px; }
   .baseline-donut::before { inset: 15px; }
   .baseline-profile dl { grid-template-columns: 1fr; }
+  .home-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .home-filters { grid-template-columns: 1fr; }
+  .home-filters > div { align-items: center; }
 }
 @media (max-width: 520px) {
   .stats-grid, .support-summary-grid { grid-template-columns: 1fr; }
