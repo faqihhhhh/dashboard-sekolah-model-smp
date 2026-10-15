@@ -46,13 +46,13 @@ Resep Makefile diawali `>` (bukan TAB) lewat `.RECIPEPREFIX`. Pengembangan di Ub
 ```
 make up          # PostgreSQL dev via Docker
 make migrate     # terapkan migrasi            | make makemigrations
-make seed        # 38 provinsi, 514 kab/kota, alias awal
+make seed        # 38 provinsi, 514 kab/kota, alias awal, codebook + rubrik baseline
 make superuser   # buat Super Admin
 make seed-demo   # 60 sekolah FIKTIF (hanya DEBUG); hapus: make demo-hapus  (WAJIB sebelum impor data asli)
 make dev         # build CSS + migrate + runserver  → http://localhost:8000
 make css | css-watch | vendor     # Tailwind / unduh library JS
 make fmt         # ruff check --fix + format
-make check       # django check + lint + pytest (terakhir terverifikasi: 172 passed)
+make check       # django check + lint + pytest (terakhir terverifikasi: 212 passed pada 2026-10-15)
 make wilayah-csv # bangun ulang apps/referensi/data/wilayah.csv (sumber: cahyadsn/wilayah, MIT, commit di-pin)
 make prod-up | prod-down | prod-ps | prod-logs | prod-superuser | prod-seed | prod-backup   # butuh .env.prod
 ```
@@ -167,13 +167,14 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
 - [x] **Fase 3 — Baseline** — `HasilBaseline`, `KamusIndikator`, `HasilIndikator` (format panjang); impor lebar→panjang; donut PM/KKA; Panduan Indikator;
   detail sekolah + edit indikator; **komponen chart perkembangan generik** (dataset ber-`time_field`)
   - [x] Model baseline dan relasi hierarki kamus indikator; skor tersimpan dengan presisi sumber
-  - [x] Kamus indikator dan panduan rating PM/KKA diekstrak dari workbook sumber; perintah `seed_baseline_reference` aman dijalankan ulang
+  - [x] Kamus indikator dan panduan rating PM/KKA diekstrak dari workbook sumber; `make seed` dan `make prod-seed` menjalankan seed idempoten
   - [x] Transformasi rating lebar→panjang dengan pemetaan kolom eksplisit; sel kosong tidak menimpa nilai
   - [x] Dry-run baseline memvalidasi pemetaan, NPSN, sekolah, periode, skor/profil, rating, dan pembaruan tanpa menulis DB
   - [x] Commit transaksional dengan riwayat, atribusi batch, serta rollback ringkasan dan indikator
   - [x] Wizard Admin unggah → pilih sheet/header → pemetaan manual → dry-run → alias rating → commit; batch muncul di riwayat impor
   - [x] Dashboard agregat dan donut PM/KKA; Guest tidak menerima data sekolah
   - [x] Panduan indikator publik; detail hasil untuk Viewer+; edit rating ber-riwayat untuk Admin+
+  - [x] Kolom Jenjang dari file sumber ditampilkan pada daftar sekolah untuk Viewer+; tidak menambah paparan Guest.
   - [x] Komponen SVG perkembangan generik berdasarkan field waktu; detail sekolah menampilkan tren skor lintas periode
 - [x] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
   - [x] Filter bersama untuk KPI dan tabel seluruh provinsi; endpoint agregat hanya mengirim hitungan publik
@@ -182,13 +183,23 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Model dua jenis dokumen per sekolah, berkas PDF privat atau tautan Google Drive, soft delete dan riwayat
   - [x] Tabel sekolah sesuai kolom contoh; Guest hanya menerima status, Viewer+ membuka dokumen, Admin+ mengelola dokumen
   - [x] Empat ringkasan kelengkapan dan grafik kumulatif berdasarkan waktu pencatatan aplikasi
+  - [x] `make check` — 221 tes lulus; Django check, lint, dan format lulus (2026-10-15)
   - [ ] Verifikasi tampilan melalui browser dan operasional unggah/penyajian PDF di lingkungan Docker (belum dijalankan di sesi ini)
 - [ ] **Fase 6 — Intervensi** — 3 penyelenggara; KPI status, kategori, unsur terlibat (M2M), jadwal bulanan, rencana vs realisasi, kumulatif
   - [x] Tahap referensi kebutuhan: agregat `Kendala` dan `Dukungan` diekstrak dari workbook baseline; halaman dapat difilter berdasarkan PM/KKA dan sasaran, Guest tidak menerima rincian per kelompok
   - [ ] Modul kegiatan operasional belum dibangun: workbook ini tidak menyediakan penyelenggara, pelaksana, tanggal, status, target, maupun realisasi intervensi
 - [ ] **Fase 7 — Hardening dan deploy final** — rate limit login, header keamanan, audit dependensi, cadangan + uji restore, domain/HTTPS, README/runbook/panduan Admin, UAT
+  - [x] Login dibatasi setelah 5 kegagalan per alamat dalam 15 menit; jeda 15 menit, state bersama di PostgreSQL, kunci alamat disimpan sebagai HMAC.
+  - [x] Header `nosniff`, `same-origin`, dan `DENY` ditetapkan eksplisit; tes respons ditambahkan. HSTS menunggu domain HTTPS final.
+  - [x] Audit `uv audit --locked` terhadap 35 paket selesai tanpa kerentanan yang diketahui (2026-10-15).
+  - [x] Runbook backup dan pemulihan ke basis data baru ditulis di `docs/operasional.md`; uji pemulihan Docker masih tertunda.
+  - [x] README penggunaan lokal ditambahkan; uji GitHub Actions menargetkan PostgreSQL 17.
+  - [x] Halaman ubah kata sandi sendiri dan halaman 404/500 ditambahkan.
 - [ ] **Fase 8 — Setelah rilis** — Kurasi & RTL (butuh spesifikasi), ekspor, edit massal, MFA, analitik/prediksi (peran DB read-only, pandas; baru bermakna setelah beberapa periode)
-- [ ] **Backlog** — README, CI GitHub Actions (lint + tes + Postgres), halaman 404/500, halaman ubah kata sandi sendiri, aturan hapus Periode, aksesibilitas
+- [ ] **Backlog** — aturan hapus Periode, audit aksesibilitas
+  - [x] README pengembangan dan operasional ditambahkan.
+  - [x] CI GitHub Actions menjalankan Django check, lint, dan tes dengan PostgreSQL 17.
+  - [x] Halaman 404/500 Bahasa Indonesia dan halaman ubah kata sandi sendiri beserta tes.
 
 ## 11. Cara bekerja dengan pemilik
 

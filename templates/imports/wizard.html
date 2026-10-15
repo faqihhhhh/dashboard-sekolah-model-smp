@@ -135,18 +135,26 @@
       {% if unknown_fields %}
         <div class="alias-panel">
           <h3>Nilai yang belum dikenali</h3>
-          <p class="muted">Pilih nilai baku untuk setiap alias. Nilai ini akan disimpan agar dapat digunakan pada impor berikutnya.</p>
+          <p class="muted">Pilih nilai baku untuk setiap alias. Dry-run akan dihitung ulang setelah diterapkan; alias tersimpan untuk impor berikutnya setelah Anda menyelesaikan impor.</p>
           <form method="post" hx-boost="true" class="import-form">
             {% csrf_token %}<input type="hidden" name="action" value="resolve">
             {% for item in unknown_fields %}
               <fieldset><legend>{{ item.label }}</legend>
                 {% for value in item.values %}
-                  <label class="alias-row"><span>{{ value }}</span>
-                    <select name="alias_{{ item.name }}_{{ value }}" class="filter-control">
-                      <option value="">Belum dipetakan</option>
-                      {% for option_value, option_label in item.options %}<option value="{{ option_value }}">{{ option_label }}</option>{% endfor %}
-                    </select>
-                  </label>
+                  <div class="alias-row"{% if item.name == "kabkota" %} x-data{% endif %}>
+                    <span>{{ value }}</span>
+                    <div class="alias-target">
+                      {% if item.name == "kabkota" %}
+                        <input type="search" class="filter-control" placeholder="Cari kabupaten/kota..."
+                               aria-label="Cari nilai baku kabupaten/kota"
+                               @input="$refs.targets.querySelectorAll('option').forEach((option, index) => { option.hidden = index > 0 && !option.textContent.toLocaleLowerCase('id').includes($event.target.value.toLocaleLowerCase('id')) })">
+                      {% endif %}
+                      <select name="alias_{{ item.name }}_{{ value }}" class="filter-control"{% if item.name == "kabkota" %} x-ref="targets"{% endif %}>
+                        <option value="">Belum dipetakan</option>
+                        {% for option_value, option_label in item.options %}<option value="{{ option_value }}">{{ option_label }}</option>{% endfor %}
+                      </select>
+                    </div>
+                  </div>
                 {% endfor %}
               </fieldset>
             {% endfor %}

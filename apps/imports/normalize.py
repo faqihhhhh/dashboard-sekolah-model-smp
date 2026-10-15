@@ -115,6 +115,7 @@ class WilayahResolver:
     _prov_index: dict = field(default_factory=dict, init=False)
     _kab_full: dict = field(default_factory=dict, init=False)
     _kab_bare: dict = field(default_factory=dict, init=False)
+    _kab_alias_keys: set[str] = field(default_factory=set, init=False)
 
     def __post_init__(self):
         from apps.referensi.models import AliasKabKota, AliasProvinsi, KabKota, Provinsi
@@ -130,7 +131,13 @@ class WilayahResolver:
             self._add(self._kab_full, norm_text(kab.nama), kab)
             self._add(self._kab_bare, _bare_name(norm_text(kab.nama)), kab)
         for alias in AliasKabKota.objects.select_related("kabkota"):
-            self._add(self._kab_full, norm_text(alias.alias), alias.kabkota)
+            alias_key = norm_text(alias.alias)
+            self._kab_alias_keys.add(alias_key)
+            self._add(self._kab_full, alias_key, alias.kabkota)
+
+    def has_kabkota_alias(self, raw: str) -> bool:
+        """True bila ejaan wilayah pernah disetujui sebagai alias kabupaten/kota."""
+        return norm_text(raw) in self._kab_alias_keys
 
     @staticmethod
     def _add(index: dict, key: str, kab) -> None:

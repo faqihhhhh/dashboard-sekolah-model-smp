@@ -68,3 +68,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.is_staff = is_super
         self.is_superuser = is_super
         super().save(*args, **kwargs)
+
+
+class LoginThrottle(models.Model):
+    """Jendela percobaan login yang dibagi semua worker aplikasi."""
+
+    key = models.CharField(max_length=64, unique=True)
+    failures = models.PositiveSmallIntegerField(default=0)
+    window_started = models.DateTimeField(default=timezone.now)
+    blocked_until = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)

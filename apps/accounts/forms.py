@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 
 from apps.core.forms import INPUT_CLASS, StyledFormMixin
 
@@ -24,6 +24,26 @@ class LoginForm(AuthenticationForm):
 
     def clean_username(self):
         return self.cleaned_data["username"].strip().lower()
+
+
+class UserPasswordChangeForm(StyledFormMixin, PasswordChangeForm):
+    """Perubahan kata sandi mandiri dengan validasi kata sandi Django."""
+
+    old_password = forms.CharField(
+        label="Kata sandi saat ini",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+    )
+    new_password1 = forms.CharField(
+        label="Kata sandi baru",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
+    new_password2 = forms.CharField(
+        label="Ulangi kata sandi baru",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
 
 
 class UserCreateForm(StyledFormMixin, forms.ModelForm):

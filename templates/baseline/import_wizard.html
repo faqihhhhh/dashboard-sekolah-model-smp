@@ -70,7 +70,7 @@
   {% elif stage == "mapping" %}
     <section class="dashboard-card import-panel">
       <h2>3. Petakan kolom dan periode</h2>
-      <p class="muted">Pemetaan rating Level 3 dilakukan manual. Kolom yang tidak dipetakan diabaikan; sel kosong tidak menghapus nilai lama.</p>
+        <p class="muted">Tinjau setiap kolom: petakan ke data yang akan disimpan atau pilih untuk diabaikan. Level 1/2 dan data tambahan dapat disimpan sebagai data profil. Sel kosong tidak menghapus nilai lama.</p>
       <form method="post" class="import-form">
         {% csrf_token %}<input type="hidden" name="action" value="preview">
         <label>Periode Baseline
@@ -86,7 +86,8 @@
             <label class="mapping-row">
               <span><strong>{{ column.letter }}</strong><span>{{ column.header }}</span></span>
               <select name="column_{{ column.index }}" class="filter-control">
-                <option value="">Abaikan kolom</option>
+                <option value="__review__"{% if item.selected == "__review__" %} selected{% endif %}>Belum ditinjau — pilih tujuan</option>
+                <option value="ignore"{% if item.selected == "ignore" %} selected{% endif %}>Abaikan dengan sadar</option>
                 <option value="npsn"{% if item.selected == "npsn" %} selected{% endif %}>NPSN sekolah</option>
                 <option value="summary:skor_pm"{% if item.selected == "summary:skor_pm" %} selected{% endif %}>Skor PM</option>
                 <option value="summary:profil_pm"{% if item.selected == "summary:profil_pm" %} selected{% endif %}>Profil PM</option>

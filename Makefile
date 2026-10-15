@@ -23,6 +23,7 @@ superuser:
 
 seed:
 > uv run python manage.py seed_wilayah
+> uv run python manage.py seed_baseline_reference
 
 seed-demo:
 > uv run python manage.py seed_demo_sekolah
@@ -74,7 +75,7 @@ prod-superuser:
 > $(PROD) exec web python manage.py createsuperuser
 
 prod-seed:
-> $(PROD) exec web python manage.py seed_wilayah
+> $(PROD) run --build --rm --no-deps web sh -c 'python manage.py seed_wilayah && python manage.py seed_baseline_reference'
 
 prod-backup:
 > $(PROD) exec -T db sh -c 'pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' | gzip > backup-$$(date +%F).sql.gz

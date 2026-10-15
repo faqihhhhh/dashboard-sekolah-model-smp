@@ -33,31 +33,26 @@
     </div>
   {% endif %}
 
-  <div class="dashboard-card mb-4" style="padding: 16px 20px;">
-    <form method="get" class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-3">
-        {% if can_search %}
-          <div class="relative w-64">
-            <input type="search" name="q" value="{{ q }}" placeholder="Cari sekolah atau NPSN..."
-                   class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition">
-          </div>
-        {% endif %}
-        {% for f in filters %}
-          <select name="{{ f.name }}" aria-label="{{ f.label }}"
-                  class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition">
-            <option value="">Semua {{ f.label|lower }}</option>
-            {% for value, label in f.options %}
-              <option value="{{ value }}" {% if value == f.selected %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        {% endfor %}
+  <div class="dashboard-card filter-card mb-4">
+    <form method="get" class="filter-layout">
+      {% if can_search %}
+        <input type="search" name="q" value="{{ q }}" aria-label="Cari sekolah atau NPSN"
+               placeholder="Cari sekolah atau NPSN..." class="filter-control">
+      {% endif %}
+      {% for f in filters %}
+        <select name="{{ f.name }}" aria-label="{{ f.label }}" class="filter-control">
+          <option value="">Semua {{ f.label|lower }}</option>
+          {% for value, label in f.options %}
+            <option value="{{ value }}" {% if value == f.selected %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      {% endfor %}
+      <div class="filter-actions">
         <button type="submit" class="button-primary button-compact">Terapkan</button>
-        <a href="{{ request.path }}" class="text-xs text-slate-500 hover:text-slate-800 transition">Reset</a>
-      </div>
-      <div class="text-xs text-slate-500 font-medium">
-        Menampilkan <strong>{{ rows|length }}</strong> data
+        <a href="{{ request.path }}" class="button-outline button-compact">Reset</a>
       </div>
     </form>
+    <p class="filter-result-count">Menampilkan <strong>{{ rows|length }}</strong> data</p>
   </div>
 
   <div class="overflow-hidden rounded-xl bg-white border border-[#e5ebef] shadow-sm">

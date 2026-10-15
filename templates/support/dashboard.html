@@ -38,11 +38,11 @@
     {% endif %}
   </section>
 
-  <form method="get" class="dashboard-card support-filters" aria-label="Filter daftar surat">
-    <label>Cari sekolah atau NPSN<input class="filter-control" type="search" name="q" value="{{ q }}" placeholder="Nama sekolah atau NPSN"></label>
-    <label>Provinsi<select class="filter-control" name="provinsi"><option value="">Semua provinsi</option>{% for item in province_options %}<option value="{{ item.kode }}"{% if selected_province == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}</select></label>
-    <label>Usulan<select class="filter-control" name="pengusul"><option value="">Semua usulan</option>{% for value, label in proposer_options %}<option value="{{ value }}"{% if selected_proposer == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
-    <div><button class="button-primary" type="submit">Terapkan</button><a class="button-outline" href="{% url 'support:dashboard' %}">Reset</a></div>
+  <form method="get" class="dashboard-card filter-layout support-filters" aria-label="Filter daftar surat">
+    <input class="filter-control" type="search" name="q" value="{{ q }}" placeholder="Nama sekolah atau NPSN" aria-label="Cari sekolah atau NPSN">
+    <select class="filter-control" name="provinsi" aria-label="Provinsi"><option value="">Semua provinsi</option>{% for item in province_options %}<option value="{{ item.kode }}"{% if selected_province == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}</select>
+    <select class="filter-control" name="pengusul" aria-label="Usulan"><option value="">Semua usulan</option>{% for value, label in proposer_options %}<option value="{{ value }}"{% if selected_proposer == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <div class="filter-actions"><button class="button-primary" type="submit">Terapkan</button><a class="button-outline" href="{% url 'support:dashboard' %}">Reset</a></div>
   </form>
 
   <section class="dashboard-card support-table-card">

@@ -9,19 +9,17 @@
     {% if can_view_detail %}<span class="card-tag">{{ category_count }} kategori pada pilihan ini</span>{% endif %}
   </section>
 
-  <form method="get" class="dashboard-card intervention-filters" aria-label="Filter ringkasan kebutuhan">
-    <label>Kerangka program
-      <select class="filter-control" name="kerangka">
+  <form method="get" class="dashboard-card filter-layout intervention-filters" aria-label="Filter ringkasan kebutuhan">
+    <select class="filter-control" name="kerangka" aria-label="Kerangka program">
         {% for value, label in frameworks %}<option value="{{ value }}"{% if framework == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-    </label>
-    <label>Sasaran
-      <select class="filter-control" name="sasaran">
+    </select>
+    <select class="filter-control" name="sasaran" aria-label="Sasaran">
         {% for value, label in targets %}<option value="{{ value }}"{% if target == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-    </label>
-    <button class="button-primary" type="submit">Terapkan</button>
-    <a class="button-outline" href="{% url 'intervensi:dashboard' %}">Reset</a>
+    </select>
+    <div class="filter-actions">
+      <button class="button-primary" type="submit">Terapkan</button>
+      <a class="button-outline" href="{% url 'intervensi:dashboard' %}">Reset</a>
+    </div>
   </form>
 
   {% if can_view_detail %}

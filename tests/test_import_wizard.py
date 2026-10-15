@@ -8,6 +8,7 @@ from openpyxl import load_workbook
 
 from apps.accounts.models import Role
 from apps.imports.models import ImportBatch, ImportBatchStatus
+from apps.referensi.models import AliasKabKota
 from apps.sekolah.models import Sekolah
 
 pytestmark = pytest.mark.django_db
@@ -81,6 +82,60 @@ def test_wizard_impor_csv_sampai_commit(client, make_user, wilayah, settings, tm
     assert batch.created_by == admin
     assert batch.file
     assert (tmp_path / "import-staging").exists()
+
+
+def test_wizard_menerapkan_dan_menyimpan_alias_kabkota(
+    client, make_user, wilayah, settings, tmp_path
+):
+    settings.MEDIA_ROOT = tmp_path
+    client.force_login(make_user(Role.ADMIN))
+    url = reverse("imports:wizard", args=["sekolah"])
+    upload = SimpleUploadedFile(
+        "sekolah.csv",
+        (
+            b"NPSN,Nama,Provinsi,Kab/Kota,Status,Pengusul,Mapel KKA\n"
+            b"12345679,SMP Bogor,Jawa Timur,Kab. Bogor,Negeri,Dinas Pendidikan,Pelaksana\n"
+        ),
+        content_type="text/csv",
+    )
+    client.post(
+        url,
+        {"action": "upload", "encoding": "utf-8", "delimiter": ",", "file": upload},
+    )
+    client.post(
+        url,
+        {
+            "action": "headers",
+            "header_rows": "1",
+            "fill_right_rows": "",
+            "first_data_row": "2",
+        },
+    )
+    response = client.post(
+        url,
+        {
+            "action": "preview",
+            "column_0": "npsn",
+            "column_1": "nama",
+            "column_2": "provinsi",
+            "column_3": "kabkota",
+            "column_4": "status",
+            "column_5": "pengusul",
+            "column_6": "mapel_kka",
+        },
+    )
+    assert response.context["preview"].counts()["error"] == 1
+    assert b"Cari kabupaten/kota..." in response.content
+    response = client.post(
+        url,
+        {"action": "resolve", "alias_kabkota_Kab. Bogor": "Kabupaten Bogor"},
+    )
+    assert response.context["preview"].counts()["error"] == 0
+    assert response.context["preview"].rows[0].values["provinsi"] == wilayah.jabar
+
+    response = client.post(url, {"action": "commit", "error_mode": "stop"})
+    assert response.context["stage"] == "done"
+    assert AliasKabKota.objects.get(alias="Kab. Bogor").kabkota == wilayah.bogor
 
 
 def test_batch_history_file_error_report_dan_rollback(client, make_user, make_sekolah):

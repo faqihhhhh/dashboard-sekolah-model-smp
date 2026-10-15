@@ -69,6 +69,7 @@ def _mapping(state):
     npsn_header = None
     summary_columns = {}
     profile_columns = {}
+    ignored_columns = []
     indicator_columns = {}
     unique_targets = set()
     for header, target in targets.items():
@@ -84,6 +85,11 @@ def _mapping(state):
             summary_columns[field_name] = header
         elif target == "profile_data":
             profile_columns[header] = header
+        elif target == "ignore":
+            ignored_columns.append(header)
+            continue
+        elif target in {"", "__review__"}:
+            raise ReaderError(f"Kolom '{header}' belum ditinjau.")
         elif target.startswith("indicator:"):
             try:
                 indicator = KamusIndikator.objects.get(
@@ -94,6 +100,8 @@ def _mapping(state):
                     "Pemetaan indikator tidak valid. Pilih ulang indikator."
                 ) from error
             indicator_columns[header] = indicator
+        else:
+            raise ReaderError(f"Tujuan kolom '{header}' tidak valid. Pilih ulang pemetaan.")
     if not npsn_header:
         raise ReaderError("Petakan satu kolom sebagai NPSN.")
     return BaselineMapping(
@@ -101,6 +109,7 @@ def _mapping(state):
         indicator_columns=indicator_columns,
         summary_columns=summary_columns,
         profile_columns=profile_columns,
+        ignored_columns=tuple(ignored_columns),
         header_rows=tuple(state.get("header_rows", [1])),
         fill_right_rows=tuple(state.get("fill_right_rows", [])),
         first_data_row=state.get("first_data_row", 2),
@@ -284,7 +293,7 @@ def import_wizard(request):
                 header_rows=list(headers),
                 fill_right_rows=list(fill),
                 first_data_row=first_row,
-                targets={column.header: "" for column in columns},
+                targets={column.header: "__review__" for column in columns},
                 mapping_ready=True,
             )
             request.session[SESSION_KEY] = state
@@ -292,13 +301,28 @@ def import_wizard(request):
         elif action == "preview":
             table = _table(state)
             columns = build_columns(table, state["header_rows"], state.get("fill_right_rows", []))
-            targets = {}
-            for column in columns:
-                target = request.POST.get(f"column_{column.index}", "")
-                if target:
-                    targets[column.header] = target
+            targets = {
+                column.header: request.POST.get(f"column_{column.index}", "__review__")
+                for column in columns
+            }
             state["targets"] = targets
             state["periode_id"] = request.POST.get("periode_id", "")
+            unresolved = [
+                header for header, target in targets.items() if target in {"", "__review__"}
+            ]
+            if unresolved:
+                request.session[SESSION_KEY] = state
+                sample = ", ".join(unresolved[:8])
+                remaining = len(unresolved) - 8
+                if remaining > 0:
+                    sample += f", dan {remaining} kolom lainnya"
+                return _render(
+                    request,
+                    state,
+                    error=(
+                        f"Tinjau semua kolom. Petakan atau pilih 'Abaikan dengan sadar': {sample}."
+                    ),
+                )
             state["stage"] = "preview"
             state.setdefault("value_maps", {})
             request.session[SESSION_KEY] = state

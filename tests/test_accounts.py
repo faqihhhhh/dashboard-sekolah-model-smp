@@ -1,5 +1,6 @@
 import pytest
 from django.db import IntegrityError
+from django.test import override_settings
 from django.urls import reverse
 
 from apps.accounts.models import Role, User
@@ -117,6 +118,45 @@ def test_login_gagal_password_salah(client, make_user):
 
 
 @pytest.mark.django_db
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+def test_login_dibatasi_setelah_lima_kegagalan(client, make_user):
+    make_user(Role.ADMIN, email="admin@example.com")
+    url = reverse("accounts:login")
+
+    for _ in range(4):
+        response = client.post(url, {"username": "admin@example.com", "password": "salah"})
+        assert response.status_code == 200
+
+    response = client.post(url, {"username": "admin@example.com", "password": "salah"})
+    assert response.status_code == 429
+    assert int(response["Retry-After"]) > 0
+
+    response = client.post(url, {"username": "admin@example.com", "password": PASSWORD})
+    assert response.status_code == 429
+    assert "Terlalu banyak percobaan masuk" in response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+def test_login_gagal_dari_ip_lain_tidak_ikut_dibatasi(client, make_user):
+    make_user(Role.ADMIN, email="admin@example.com")
+    url = reverse("accounts:login")
+    for _ in range(5):
+        client.post(
+            url,
+            {"username": "admin@example.com", "password": "salah"},
+            REMOTE_ADDR="192.0.2.1",
+        )
+
+    response = client.post(
+        url,
+        {"username": "admin@example.com", "password": PASSWORD},
+        REMOTE_ADDR="192.0.2.2",
+    )
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
 def test_login_ditolak_untuk_akun_nonaktif(client, make_user):
     make_user(Role.VIEWER, email="off@example.com", is_active=False)
     client.post(reverse("accounts:login"), {"username": "off@example.com", "password": PASSWORD})
@@ -131,6 +171,40 @@ def test_logout_harus_post(client_as):
     assert "_auth_user_id" not in client.session
 
 
+@pytest.mark.django_db
+def test_pengguna_dapat_mengubah_kata_sandi_dan_sesi_tetap_aktif(client, make_user):
+    user = make_user(Role.VIEWER, email="ubah@example.com")
+    client.force_login(user)
+    response = client.post(
+        reverse("accounts:password_change"),
+        {
+            "old_password": PASSWORD,
+            "new_password1": "KataSandiBaru!2026",
+            "new_password2": "KataSandiBaru!2026",
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.url == reverse("core:home")
+    user.refresh_from_db()
+    assert user.check_password("KataSandiBaru!2026")
+    assert client.get(reverse("core:home")).status_code == 200
+
+
+@pytest.mark.django_db
+def test_ubah_kata_sandi_memerlukan_login(client):
+    response = client.get(reverse("accounts:password_change"))
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("accounts:login"))
+
+
+@pytest.mark.parametrize("role", [Role.VIEWER, Role.ADMIN, Role.SUPER_ADMIN])
+def test_semua_peran_terautentikasi_dapat_membuka_ubah_kata_sandi(client_as, role):
+    response = client_as(role).get(reverse("accounts:password_change"))
+    assert response.status_code == 200
+    assert "Kata sandi saat ini" in response.content.decode()
+
+
 # --- Tampilan per peran ---
 
 
@@ -138,6 +212,8 @@ def test_logout_harus_post(client_as):
 def test_guest_melihat_tombol_masuk_dan_tanpa_menu_pengguna(client):
     html = client.get(reverse("core:home")).content.decode()
     assert "Masuk" in html
+    assert "/static/images/kemendikdasmen.png" in html
+    assert 'alt="Kemendikdasmen"' in html
     assert "Keluar" not in html
     assert "/pengguna/" not in html
 

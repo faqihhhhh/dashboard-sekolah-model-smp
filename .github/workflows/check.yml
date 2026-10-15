@@ -1,0 +1,41 @@
+name: Pemeriksaan aplikasi
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: sekolah_model
+          POSTGRES_USER: sekolah
+          POSTGRES_PASSWORD: sekolah_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sekolah -d sekolah_model"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DEBUG: "True"
+      SECRET_KEY: ci-only-secret-key
+      ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      DATABASE_URL: postgres://sekolah:sekolah_dev@localhost:5432/sekolah_model
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --all-groups
+      - run: make check

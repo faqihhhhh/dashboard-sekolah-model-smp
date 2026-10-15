@@ -24,6 +24,7 @@ from django.db import IntegrityError, transaction
 from apps.core.registry import DatasetSpec
 from apps.imports.engine import ImportPreview, MappingConfig, RowResult
 from apps.imports.models import ImportBatch, ImportBatchStatus, ValueAlias
+from apps.referensi.models import AliasKabKota, AliasProvinsi, KabKota, Provinsi
 
 REASON_MAX = 100
 
@@ -203,7 +204,32 @@ def commit_preview(
             elif row.action == "update":
                 result.updated += 1
 
-        # Simpan alias nilai yang disetujui ke database (ValueAlias)
+        # Simpan alias wilayah ke referensi wilayah agar bisa dipakai pada impor berikutnya.
+        if mapping_config and getattr(mapping_config, "value_maps", None):
+            for field_name, aliases in mapping_config.value_maps.items():
+                if field_name not in ("provinsi", "kabkota"):
+                    continue
+                target_model = Provinsi if field_name == "provinsi" else KabKota
+                alias_model = AliasProvinsi if field_name == "provinsi" else AliasKabKota
+                relation_name = "provinsi" if field_name == "provinsi" else "kabkota"
+                for alias_str, target_val in aliases.items():
+                    target = target_model.objects.filter(
+                        nama__iexact=str(target_val).strip()
+                    ).first()
+                    if target is None:
+                        raise CommitBlocked(
+                            f"Nilai baku wilayah '{target_val}' tidak lagi tersedia. "
+                            "Ulangi pemetaan wilayah."
+                        )
+                    alias = str(alias_str).strip()
+                    existing_alias = alias_model.objects.filter(alias__iexact=alias).first()
+                    if existing_alias:
+                        setattr(existing_alias, relation_name, target)
+                        existing_alias.save(update_fields=[relation_name])
+                    else:
+                        alias_model.objects.create(**{relation_name: target, "alias": alias})
+
+        # Simpan alias pilihan lain ke database (ValueAlias).
         if mapping_config and getattr(mapping_config, "value_maps", None):
             for field_name, aliases in mapping_config.value_maps.items():
                 if field_name not in ("provinsi", "kabkota"):

@@ -17,8 +17,7 @@
 
   <aside class="sidebar" :class="sidebarOpen ? 'sidebar-open' : ''">
     <a class="brand" href="{% url 'core:home' %}" aria-label="Beranda Sekolah Model SMP">
-      <span class="brand-name">Kemen<strong>dikdasmen</strong></span>
-      <span class="brand-caption">Direktorat Sekolah Menengah Pertama</span>
+      <img class="brand-logo" src="{% static 'images/kemendikdasmen.png' %}" alt="Kemendikdasmen">
     </a>
 
     <nav class="sidebar-nav" aria-label="Menu utama">
@@ -54,6 +53,7 @@
         {% if user.is_authenticated %}
           <span class="avatar" aria-hidden="true">{{ user.full_name|first|upper }}</span>
           <span class="account-copy"><strong>{{ user.full_name }}</strong><small>{{ user.get_role_display }}</small></span>
+          <a class="account-action" href="{% url 'accounts:password_change' %}">Ubah kata sandi</a>
           <form method="post" action="{% url 'accounts:logout' %}">
             {% csrf_token %}<button type="submit" class="account-action">Keluar</button>
           </form>

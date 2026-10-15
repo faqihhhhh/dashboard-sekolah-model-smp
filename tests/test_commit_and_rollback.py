@@ -15,6 +15,7 @@ from apps.imports.engine import MappingConfig, run_dry_run
 from apps.imports.models import ImportBatch, ImportBatchStatus, MappingProfile, ValueAlias
 from apps.imports.readers import Table
 from apps.imports.rollback import can_rollback, rollback_batch
+from apps.referensi.models import AliasKabKota
 from apps.sekolah.models import Sekolah
 
 pytestmark = pytest.mark.django_db
@@ -103,6 +104,38 @@ def test_commit_create_sekolah(wilayah, make_user):
     hist = sekolah.history.first()
     assert hist.history_user == admin
     assert f"Batch #{result.batch.pk}" in hist.history_change_reason
+
+
+def test_commit_menyimpan_alias_kabkota_untuk_impor_berikutnya(wilayah, make_user):
+    admin = make_user(email="admin@test.com", role=Role.ADMIN)
+    spec = get_spec("sekolah")
+    headers = ["NPSN", "Nama", "Kab/Kota", "Status", "Pengusul", "Mapel KKA"]
+    table = Table(
+        name="Data",
+        rows=[
+            headers,
+            ["10101012", "SMP Bogor", "Kab. Bogor", "Negeri", "Dinas Pendidikan", "Pelaksana"],
+        ],
+        n_cols=len(headers),
+    )
+    mapping = MappingConfig(
+        columns={
+            "NPSN": "npsn",
+            "Nama": "nama",
+            "Kab/Kota": "kabkota",
+            "Status": "status",
+            "Pengusul": "pengusul",
+            "Mapel KKA": "mapel_kka",
+        },
+        value_maps={"kabkota": {"Kab. Bogor": "Kabupaten Bogor"}},
+    )
+    preview = run_dry_run(spec, table, mapping)
+
+    result = commit_preview(spec, preview, admin, filename="data.csv", mapping_config=mapping)
+
+    alias = AliasKabKota.objects.get(alias="Kab. Bogor")
+    assert alias.kabkota == wilayah.bogor
+    assert result.created == 1
 
 
 def test_commit_update_sekolah(wilayah, make_sekolah, make_user):

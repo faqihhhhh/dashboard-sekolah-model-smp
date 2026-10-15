@@ -111,6 +111,7 @@ class BaselineMapping:
     indicator_columns: Mapping[str, KamusIndikator] = field(default_factory=dict)
     summary_columns: Mapping[str, str] = field(default_factory=dict)
     profile_columns: Mapping[str, str] = field(default_factory=dict)
+    ignored_columns: tuple[str, ...] = ()
     header_rows: tuple[int, ...] = (1,)
     fill_right_rows: tuple[int, ...] = ()
     first_data_row: int = 2
@@ -336,6 +337,7 @@ def _baseline_mapping_json(mapping: BaselineMapping, periode: Periode) -> dict[s
         "npsn_header": mapping.npsn_header,
         "summary_columns": dict(mapping.summary_columns),
         "profile_columns": dict(mapping.profile_columns),
+        "ignored_columns": list(mapping.ignored_columns),
         "indicator_columns": {
             header: {
                 "kerangka": indicator.kerangka,

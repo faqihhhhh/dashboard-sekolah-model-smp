@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import pytest
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import Role
@@ -36,6 +37,31 @@ def test_healthz_ok(client):
     response = client.get(reverse("core:healthz"))
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "database": "ok"}
+
+
+@pytest.mark.django_db
+def test_header_keamanan_diterapkan(client):
+    response = client.get(reverse("core:healthz"))
+
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["Referrer-Policy"] == "same-origin"
+    assert response.headers["X-Frame-Options"] == "DENY"
+
+
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver"])
+def test_halaman_404_memakai_template_bahasa_indonesia(client):
+    response = client.get("/alamat-tidak-ada/")
+    assert response.status_code == 404
+    assert "Halaman tidak ditemukan" in response.content.decode()
+
+
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver"])
+def test_halaman_500_memakai_template_sederhana():
+    from apps.core.views import server_error
+
+    response = server_error(RequestFactory().get("/"))
+    assert response.status_code == 500
+    assert "Terjadi gangguan" in response.content.decode()
 
 
 @pytest.mark.django_db

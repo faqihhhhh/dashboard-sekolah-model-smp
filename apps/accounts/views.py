@@ -1,16 +1,75 @@
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.views.generic import CreateView, FormView, ListView, UpdateView
 
 from apps.core.mixins import FormPageMixin
 
-from .forms import AdminSetPasswordForm, UserCreateForm, UserUpdateForm
+from .forms import (
+    AdminSetPasswordForm,
+    LoginForm,
+    UserCreateForm,
+    UserPasswordChangeForm,
+    UserUpdateForm,
+)
 from .models import User
 from .permissions import SuperAdminRequiredMixin
+from .throttle import blocked_until, clear_failures, record_failure
+
+
+class ThrottledLoginView(LoginView):
+    template_name = "accounts/login.html"
+    form_class = LoginForm
+    redirect_authenticated_user = True
+
+    def _limited_response(self, form, until):
+        form.add_error(None, "Terlalu banyak percobaan masuk. Coba lagi setelah 15 menit.")
+        response = self.render_to_response(self.get_context_data(form=form), status=429)
+        response["Retry-After"] = str(max(1, int((until - timezone.now()).total_seconds())))
+        return response
+
+    def post(self, request, *args, **kwargs):
+        until = blocked_until(request)
+        if until:
+            return self._limited_response(self.get_form(), until)
+        return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        if form.non_field_errors():
+            until = record_failure(self.request)
+            if until:
+                return self._limited_response(form, until)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        clear_failures(self.request)
+        return super().form_valid(form)
+
+
+class UserPasswordChangeView(LoginRequiredMixin, FormPageMixin, FormView):
+    form_class = UserPasswordChangeForm
+    template_name = "form.html"
+    success_url = reverse_lazy("core:home")
+    page_title = "Ubah kata sandi"
+    submit_label = "Simpan kata sandi"
+    cancel_url_name = "core:home"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        user = form.save()
+        update_session_auth_hash(self.request, user)
+        messages.success(self.request, "Kata sandi berhasil diubah.")
+        return super().form_valid(form)
 
 
 class UserListView(SuperAdminRequiredMixin, ListView):

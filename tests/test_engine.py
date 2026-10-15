@@ -15,6 +15,7 @@ from apps.imports.engine import (
     run_dry_run,
 )
 from apps.imports.readers import Table
+from apps.referensi.models import AliasKabKota
 from apps.sekolah.models import Sekolah
 
 pytestmark = pytest.mark.django_db
@@ -87,6 +88,82 @@ def test_admin_value_maps_override(wilayah):
     prev2 = run_dry_run(spec, table, mapping_with_map)
     assert prev2.counts()["error"] == 0
     assert prev2.rows[0].values["pengusul"] == "dinas"
+
+
+def test_alias_kabkota_manual_mengoreksi_provinsi_yang_bertentangan(wilayah):
+    spec = get_spec("sekolah")
+    headers = [
+        "NPSN",
+        "Nama",
+        "Provinsi",
+        "Kab/Kota",
+        "Status",
+        "Pengusul",
+        "Mapel KKA",
+    ]
+    rows = [
+        headers,
+        [
+            "10100098",
+            "SMP Malang",
+            "Jawa Barat",
+            "Kab. Malang",
+            "Negeri",
+            "Dinas Pendidikan",
+            "Pelaksana",
+        ],
+    ]
+    table = Table(name="Data", rows=rows, n_cols=len(headers))
+    fields = ["npsn", "nama", "provinsi", "kabkota", "status", "pengusul", "mapel_kka"]
+    columns = dict(zip(headers, fields, strict=True))
+    mapping = MappingConfig(columns=columns)
+
+    unresolved = run_dry_run(spec, table, mapping)
+    assert unresolved.counts()["error"] == 1
+    assert "Kab. Malang" in unresolved.unknown_values["kabkota"]
+
+    mapping.value_maps = {"kabkota": {"Kab. Malang": "Kabupaten Malang"}}
+    resolved = run_dry_run(spec, table, mapping)
+    assert resolved.counts()["error"] == 0
+    assert resolved.rows[0].values["kabkota"] == wilayah.malang
+    assert resolved.rows[0].values["provinsi"] == wilayah.jatim
+    assert any(issue.level == "warning" for issue in resolved.rows[0].issues)
+
+
+def test_alias_kabkota_tersimpan_tetap_mengoreksi_provinsi(wilayah):
+    AliasKabKota.objects.create(alias="Kab. Malang", kabkota=wilayah.malang)
+    headers = ["NPSN", "Nama", "Provinsi", "Kab/Kota", "Status", "Pengusul", "Mapel KKA"]
+    table = Table(
+        name="Data",
+        rows=[
+            headers,
+            [
+                "10100097",
+                "SMP Malang",
+                "Jawa Barat",
+                "Kab. Malang",
+                "Negeri",
+                "Dinas Pendidikan",
+                "Pelaksana",
+            ],
+        ],
+        n_cols=len(headers),
+    )
+    mapping = MappingConfig(
+        columns=dict(
+            zip(
+                headers,
+                ["npsn", "nama", "provinsi", "kabkota", "status", "pengusul", "mapel_kka"],
+                strict=True,
+            )
+        )
+    )
+
+    preview = run_dry_run(get_spec("sekolah"), table, mapping)
+
+    assert preview.counts()["error"] == 0
+    assert preview.rows[0].values["kabkota"] == wilayah.malang
+    assert preview.rows[0].values["provinsi"] == wilayah.jatim
 
 
 def test_dry_run_tidak_menyimpan_perubahan(wilayah):

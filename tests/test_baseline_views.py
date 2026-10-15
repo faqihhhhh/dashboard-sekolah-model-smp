@@ -13,6 +13,7 @@ from apps.baseline.models import (
     PanduanRating,
     RatingIndikator,
 )
+from apps.imports.models import ImportBatch
 from apps.referensi.models import Periode
 
 
@@ -99,6 +100,51 @@ def test_admin_dapat_upload_pemetaan_dry_run_dan_commit_baseline(
 
 
 @pytest.mark.django_db
+def test_wizard_baseline_meminta_konfirmasi_untuk_kolom_yang_diabaikan(client_as, make_sekolah):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Tinjau Kolom", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    client = client_as("admin")
+    url = reverse("baseline:import_wizard")
+    upload = SimpleUploadedFile(
+        "baseline.csv",
+        f"NPSN,Catatan,Kosong\n{school.npsn},Data tambahan,\n".encode(),
+        content_type="text/csv",
+    )
+
+    client.post(url, {"action": "upload", "encoding": "utf-8", "delimiter": ",", "file": upload})
+    client.post(url, {"action": "headers", "header_rows": "1", "first_data_row": "2"})
+
+    response = client.post(
+        url,
+        {"action": "preview", "periode_id": str(period.pk), "column_0": "npsn"},
+    )
+    assert response.context["stage"] == "mapping"
+    assert "Catatan" in response.context["error"]
+    assert "Kosong" in response.context["error"]
+
+    response = client.post(
+        url,
+        {
+            "action": "preview",
+            "periode_id": str(period.pk),
+            "column_0": "npsn",
+            "column_1": "profile_data",
+            "column_2": "ignore",
+        },
+    )
+    assert response.context["stage"] == "preview"
+
+    response = client.post(url, {"action": "commit", "error_mode": "stop"})
+    assert response.context["stage"] == "done"
+    baseline = HasilBaseline.objects.get(sekolah=school, periode=period)
+    assert baseline.profil_data == {"Catatan": "Data tambahan"}
+    batch = ImportBatch.objects.get(dataset_key="baseline")
+    assert batch.mapping_config["ignored_columns"] == ["Kosong"]
+
+
+@pytest.mark.django_db
 def test_guest_hanya_menerima_agregat_baseline(make_sekolah, client):
     school = make_sekolah(nama="SMP Data Terbatas")
     period = Periode.objects.create(
@@ -162,6 +208,27 @@ def test_detail_baseline_dan_edit_rating_dibatasi_peran(make_sekolah, make_user,
     result.refresh_from_db()
     assert result.rating == RatingIndikator.UNGGUL
     assert result.history.first().history_user == admin
+
+
+@pytest.mark.django_db
+def test_detail_baseline_menampilkan_nilai_level_satu_dan_dua_sebagai_data_profil(
+    client_as, make_sekolah
+):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Profil Level", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    baseline = HasilBaseline.objects.create(
+        sekolah=school,
+        periode=period,
+        profil_data={"PM Level 2 | 1.1": "Maju", "PM Level 1 | murid": "Berkembang"},
+    )
+
+    response = client_as("viewer").get(reverse("baseline:detail", args=[baseline.pk]))
+
+    assert response.status_code == 200
+    assert "PM Level 2 | 1.1" in response.content.decode()
+    assert "PM Level 1 | murid" in response.content.decode()
 
 
 @pytest.mark.django_db

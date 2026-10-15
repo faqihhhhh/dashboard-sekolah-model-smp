@@ -14,12 +14,10 @@
     </div>
   </section>
 
-  <form method="get" class="dashboard-card filter-bar">
-    <label>Periode baseline
-      <select name="periode" class="filter-control" onchange="this.form.submit()">
+  <form method="get" class="dashboard-card filter-layout filter-bar">
+    <select name="periode" class="filter-control" aria-label="Periode baseline" onchange="this.form.submit()">
         {% for item in periods %}<option value="{{ item.pk }}"{% if period.pk == item.pk %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
-      </select>
-    </label>
+    </select>
   </form>
 
   {% if period %}
@@ -54,10 +52,10 @@
     {% if is_viewer %}
       <section class="dashboard-card baseline-list-card">
         <div class="card-heading"><div><h2>Hasil per sekolah</h2><p class="muted">Data ini hanya tersedia untuk pengguna yang sudah masuk.</p></div></div>
-        <form method="get" class="search-bar">
+        <form method="get" class="filter-layout search-bar">
           <input type="hidden" name="periode" value="{{ period.pk }}">
-          <input name="q" value="{{ query }}" placeholder="Cari nama sekolah atau NPSN" class="filter-control">
-          <button class="button-outline" type="submit">Cari</button>
+          <input name="q" value="{{ query }}" placeholder="Cari nama sekolah atau NPSN" aria-label="Cari nama sekolah atau NPSN" class="filter-control">
+          <div class="filter-actions"><button class="button-outline" type="submit">Cari</button></div>
         </form>
         <div class="import-table-wrap"><table class="import-table">
           <thead><tr><th>NPSN</th><th>Nama sekolah</th><th>Kabupaten/kota</th><th>Skor PM</th><th>Profil PM</th><th>Skor KKA</th><th>Profil KKA</th><th></th></tr></thead>

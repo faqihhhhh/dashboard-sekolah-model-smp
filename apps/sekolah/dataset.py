@@ -11,6 +11,7 @@ SEKOLAH = register(
         list_fields=(
             "npsn",
             "nama",
+            "jenjang",
             "provinsi",
             "kabkota",
             "status",

@@ -78,6 +78,7 @@ def test_guest_hanya_melihat_kolom_publik(client, make_sekolah):
     make_sekolah(npsn="10100001", nama="SMP Rahasia Angka", jumlah_guru=777)
     html = client.get(LIST).content.decode()
     assert "SMP Rahasia Angka" in html and "10100001" in html
+    assert "Jenjang" not in html
     assert "Jumlah guru tetap" not in html
     assert "777" not in html  # data sensitif tidak pernah ikut terkirim
     assert "Aksi" not in html and "+ Tambah" not in html
@@ -87,6 +88,7 @@ def test_viewer_melihat_semua_kolom_tanpa_tombol_ubah(client_as, make_sekolah):
     make_sekolah(jumlah_guru=777)
     html = client_as(Role.VIEWER).get(LIST).content.decode()
     assert "Jumlah guru tetap" in html and "777" in html
+    assert "Jenjang" in html and "SMP" in html
     assert "Aksi" not in html and "+ Tambah" not in html
 
 

@@ -21,29 +21,21 @@
     </div>
   </section>
 
-  <form method="get" class="dashboard-card home-filters" aria-label="Filter ringkasan sekolah">
-    <label>Provinsi
-      <select name="provinsi" class="filter-control">
+  <form method="get" class="dashboard-card filter-layout home-filters" aria-label="Filter ringkasan sekolah">
+    <select name="provinsi" class="filter-control" aria-label="Provinsi">
         <option value="">Semua provinsi</option>
         {% for item in provinsi_options %}<option value="{{ item.kode }}"{% if filters.provinsi == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
-      </select>
-    </label>
-    <label>Status sekolah
-      <select name="status" class="filter-control"><option value="">Semua status</option>
+    </select>
+    <select name="status" class="filter-control" aria-label="Status sekolah"><option value="">Semua status</option>
         {% for value, label in status_options %}<option value="{{ value }}"{% if filters.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-    </label>
-    <label>Pengusul
-      <select name="pengusul" class="filter-control"><option value="">Semua pengusul</option>
+    </select>
+    <select name="pengusul" class="filter-control" aria-label="Pengusul"><option value="">Semua pengusul</option>
         {% for value, label in pengusul_options %}<option value="{{ value }}"{% if filters.pengusul == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-    </label>
-    <label>Mapel KKA
-      <select name="mapel_kka" class="filter-control"><option value="">Semua status</option>
+    </select>
+    <select name="mapel_kka" class="filter-control" aria-label="Mapel KKA"><option value="">Semua mapel KKA</option>
         {% for value, label in mapel_options %}<option value="{{ value }}"{% if filters.mapel_kka == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-    </label>
-    <div><button class="button-primary" type="submit">Terapkan filter</button><a class="button-outline" href="{% url 'core:home' %}">Reset</a></div>
+    </select>
+    <div class="filter-actions"><button class="button-primary" type="submit">Terapkan filter</button><a class="button-outline" href="{% url 'core:home' %}">Reset</a></div>
   </form>
 
   <section class="stats-grid" aria-label="Ringkasan sekolah">

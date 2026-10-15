@@ -276,6 +276,7 @@ def run_dry_run(spec: DatasetSpec, table: Table, mapping: MappingConfig) -> Impo
         issues: list[RowIssue] = []
 
         # --- A. Wilayah: Provinsi ---
+        raw_prov_str = None
         prov_header = next(
             (h for h, fn in mapping.columns.items() if fn == "provinsi"),
             None,
@@ -303,10 +304,32 @@ def run_dry_run(spec: DatasetSpec, table: Table, mapping: MappingConfig) -> Impo
                 raw_kab_str = str(raw_kab).strip()
                 kab_val = mapping.value_maps.get("kabkota", {}).get(raw_kab_str, raw_kab_str)
                 prov_context = row_values.get("provinsi")
-                res_kab = wilayah_resolver.resolve_kabkota(kab_val, provinsi=prov_context)
+                has_explicit_kab_mapping = raw_kab_str in mapping.value_maps.get(
+                    "kabkota", {}
+                ) or wilayah_resolver.has_kabkota_alias(raw_kab_str)
+                res_kab = wilayah_resolver.resolve_kabkota(
+                    kab_val, provinsi=None if has_explicit_kab_mapping else prov_context
+                )
                 if res_kab.ok:
                     row_values["kabkota"] = res_kab.obj
-                    if "provinsi" not in row_values:
+                    if has_explicit_kab_mapping:
+                        if raw_prov_str and (
+                            prov_context is None or prov_context.pk != res_kab.obj.provinsi_id
+                        ):
+                            issues[:] = [issue for issue in issues if issue.field != "provinsi"]
+                            unknown_values.setdefault("provinsi", set()).discard(raw_prov_str)
+                            issues.append(
+                                RowIssue(
+                                    message=(
+                                        "Provinsi disesuaikan mengikuti kabupaten/kota yang "
+                                        "dipetakan."
+                                    ),
+                                    field="provinsi",
+                                    level="warning",
+                                )
+                            )
+                        row_values["provinsi"] = res_kab.obj.provinsi
+                    elif "provinsi" not in row_values:
                         row_values["provinsi"] = res_kab.obj.provinsi
                 else:
                     unknown_values.setdefault("kabkota", set()).add(raw_kab_str)
