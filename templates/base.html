@@ -58,8 +58,6 @@
             {% csrf_token %}<button type="submit" class="account-action">Keluar</button>
           </form>
         {% else %}
-          <span class="avatar" aria-hidden="true">G</span>
-          <span class="account-copy"><strong>Pengunjung</strong><small>Guest</small></span>
           <a class="account-action login-action" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Masuk</a>
         {% endif %}
       </div>

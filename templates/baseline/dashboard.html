@@ -6,7 +6,7 @@
       <h1>Baseline Sekolah</h1>
       <p class="muted">Ringkasan hasil Pembelajaran Mendalam dan Koding & Kecerdasan Artifisial.</p>
     </div>
-    <div class="page-actions">
+    <div class="page-head-actions">
       <a href="{% url 'baseline:guide' %}" class="button-outline">Panduan indikator</a>
       {% if user.is_authenticated and user.role == "admin" or user.is_authenticated and user.role == "super_admin" %}
         <a href="{% url 'baseline:import_wizard' %}" class="button-primary">Impor baseline</a>

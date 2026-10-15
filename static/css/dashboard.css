@@ -290,7 +290,8 @@ button, input, select, textarea { font-family: inherit; }
 .batch-metrics dd { margin: 4px 0 0; color: #0f172a; font-size: 20px; font-weight: 800; }
 .rollback-panel { display: grid; gap: 12px; border-color: #fecaca; }
 .rollback-panel h2 { margin: 0; color: #991b1b; font-size: 16px; }
-.page-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.page-head-actions { display: flex; width: min(100%, 520px); flex: 1 1 360px; flex-wrap: wrap; gap: 8px; }
+.page-head-actions > * { min-width: min(100%, 150px); flex: 1 1 150px; text-align: center; }
 .baseline-donut-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .baseline-donut-card { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 12px 18px; align-items: center; }
 .baseline-donut-card h2, .baseline-list-card h2, .indicator-detail-card h2 { margin: 0; color: #0f172a; font-size: 16px; font-weight: 750; }
@@ -396,6 +397,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .page-footer { flex-direction: column; gap: 6px; padding: 16px; }
   .dashboard-head, .page-head { flex-direction: column; gap: 12px; }
   .page-head > div + div, .page-head > a { align-self: flex-start; }
+  .page-head-actions { width: 100%; flex-basis: auto; align-self: stretch !important; }
   .dashboard-head h1, .page-head h1 { font-size: 22px; }
   .dashboard-hero { padding: 22px 20px; }
   .dashboard-hero h2 { font-size: 19px; }
