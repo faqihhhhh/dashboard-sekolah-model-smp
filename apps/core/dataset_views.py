@@ -51,9 +51,7 @@ class DatasetListView(ListView):
                 if name == "provinsi"
                 else [self.request.GET.get(name, "")]
             )
-            valid_values = [
-                value for value in values if value in dict(spec.filter_options(name))
-            ]
+            valid_values = [value for value in values if value in dict(spec.filter_options(name))]
             if valid_values:  # nilai asing diabaikan
                 if name == "provinsi":
                     queryset = queryset.filter(provinsi__in=valid_values)
