@@ -20,15 +20,22 @@ from .models import DokumenDukungan, JenisSurat
 
 
 def dashboard(request):
-    filters = parse_home_filters(request.GET)
+    filter_params = request.GET.copy()
+    filter_params.pop("provinsi", None)
+    filters = parse_home_filters(filter_params)
+    province_options = list(Provinsi.objects.order_by("nama"))
+    requested_provinces = set(request.GET.getlist("provinsi"))
+    selected_provinces = [
+        province.kode for province in province_options if province.kode in requested_provinces
+    ]
     schools = Sekolah.objects.select_related("provinsi", "kabkota").prefetch_related(
         "dokumen_dukungan"
     )
     query = request.GET.get("q", "").strip()[:100]
     if query:
         schools = schools.filter(Q(npsn__icontains=query) | Q(nama__icontains=query))
-    if filters.get("provinsi"):
-        schools = schools.filter(provinsi__kode=filters["provinsi"])
+    if selected_provinces:
+        schools = schools.filter(provinsi__kode__in=selected_provinces)
     if filters.get("pengusul"):
         schools = schools.filter(pengusul=filters["pengusul"])
     schools = list(schools)
@@ -105,8 +112,8 @@ def dashboard(request):
             "rows": rows,
             "summaries": summaries,
             "q": query,
-            "province_options": Provinsi.objects.all(),
-            "selected_province": filters.get("provinsi", ""),
+            "province_options": province_options,
+            "selected_provinces": selected_provinces,
             "selected_proposer": filters.get("pengusul", ""),
             "proposer_options": Pengusul.choices,
             "can_edit": has_role(request.user, Role.ADMIN),

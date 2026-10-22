@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ heading }}{% endblock %}
 
 {% block content %}
@@ -34,30 +35,63 @@
   {% endif %}
 
   <div class="dashboard-card filter-card mb-4">
-    <form method="get" class="filter-layout">
+    <form method="get" class="filter-layout" data-auto-submit-filter>
       {% if can_search %}
-        <input type="search" name="q" value="{{ q }}" aria-label="Cari sekolah atau NPSN"
-               placeholder="Cari sekolah atau NPSN..." class="filter-control">
+        <label class="filter-search">
+          <span>Cari</span>
+          <input type="search" name="q" value="{{ q }}" aria-label="Cari sekolah atau NPSN"
+                 placeholder="Nama sekolah atau NPSN..." class="filter-control">
+        </label>
       {% endif %}
       {% for f in filters %}
-        <select name="{{ f.name }}" aria-label="{{ f.label }}" class="filter-control">
-          <option value="">Semua {{ f.label|lower }}</option>
-          {% for value, label in f.options %}
-            <option value="{{ value }}" {% if value == f.selected %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
+        {% if f.name == "provinsi" %}
+          <details class="filter-multi" data-multi-filter>
+            <summary class="filter-control">
+              {% if f.selected %}Provinsi dipilih ({{ f.selected|length }}){% else %}Semua provinsi{% endif %}
+            </summary>
+            <div class="filter-multi-options" aria-label="Pilih provinsi">
+              {% for value, label in f.options %}
+                <label>
+                  <input type="checkbox" name="{{ f.name }}" value="{{ value }}"
+                         {% if value in f.selected %}checked{% endif %}>
+                  <span>{{ label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </details>
+        {% else %}
+          <select name="{{ f.name }}" aria-label="{{ f.label }}" class="filter-control">
+            <option value="">Semua {{ f.label|lower }}</option>
+            {% for value, label in f.options %}
+              <option value="{{ value }}" {% if value == f.selected %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
       {% endfor %}
-      <div class="filter-actions">
-        <button type="submit" class="button-primary button-compact">Terapkan</button>
-        <a href="{{ request.path }}" class="button-outline button-compact">Reset</a>
+      {% for f in filters %}
+        {% if f.name == "provinsi" and f.selected %}
+          <div class="active-filter-chips" aria-label="Provinsi yang dipilih">
+            {% for value, label in f.options %}
+              {% if value in f.selected %}
+                <span class="active-filter-chip">
+                  <span>Provinsi: {{ label }}</span>
+                  <button type="button" data-remove-province="{{ value }}"
+                          aria-label="Hapus filter provinsi {{ label }}">×</button>
+                </span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endfor %}
+      <div class="filter-actions filter-actions-auto">
+        <a href="{{ request.path }}" class="button-outline button-compact filter-reset">Reset</a>
       </div>
     </form>
-    <p class="filter-result-count">Menampilkan <strong>{{ rows|length }}</strong> data</p>
   </div>
 
   <div class="overflow-hidden rounded-xl bg-white border border-[#e5ebef] shadow-sm">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-slate-200 text-xs">
+      <table class="school-list-table min-w-full divide-y divide-slate-200 text-xs">
         <thead class="bg-[#f8fafb] text-left text-[11px] font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200">
           <tr>
             {% for label in columns %}
@@ -72,17 +106,36 @@
           {% for row in rows %}
             <tr class="hover:bg-slate-50/70 transition">
               {% for cell in row.cells %}
-                <td class="px-4 py-3 {% if forloop.first %}font-mono font-semibold text-slate-600{% endif %}">
-                  {{ cell }}
+                <td class="px-4 py-3 {% if forloop.first %}font-mono text-slate-600{% endif %}">
+                  {% if cell == "Negeri" %}
+                    <span class="status-badge status-negeri">{{ cell }}</span>
+                  {% elif cell == "Swasta" %}
+                    <span class="status-badge status-swasta">{{ cell }}</span>
+                  {% elif cell == "Mitra" %}
+                    <span class="status-badge status-pengusul-mitra">{{ cell }}</span>
+                  {% elif cell == "Dinas Pendidikan" %}
+                    <span class="status-badge status-pengusul-dinas-pendidikan">{{ cell }}</span>
+                  {% elif cell == "Pelaksana" %}
+                    <span class="status-badge status-mapelkka-pelaksana">{{ cell }}</span>
+                  {% elif cell == "Bukan pelaksana" %}
+                    <span class="status-badge status-mapelkka-bukan-pelaksana">{{ cell }}</span>
+                  {% else %}
+                    {{ cell }}
+                  {% endif %}
                 </td>
               {% endfor %}
               {% if can_edit %}
                 <td class="whitespace-nowrap px-4 py-3 text-right text-xs">
                   <a href="{{ row.edit_url }}" class="font-semibold text-blue-600 hover:text-blue-800">Ubah</a>
-                  <span class="px-1 text-slate-300">|</span>
-                  <a href="{{ row.history_url }}" class="font-semibold text-slate-600 hover:text-slate-800">Riwayat</a>
-                  <span class="px-1 text-slate-300">|</span>
-                  <a href="{{ row.delete_url }}" class="font-semibold text-rose-600 hover:text-rose-800">Hapus</a>
+                  <details class="row-actions">
+                    <summary class="row-actions-trigger" aria-label="Aksi lainnya" title="Aksi lainnya">
+                      <span aria-hidden="true">⋮</span>
+                    </summary>
+                    <div class="row-actions-menu">
+                      <a href="{{ row.info_url }}">Info</a>
+                      <a href="{{ row.delete_url }}" class="row-actions-delete">Hapus</a>
+                    </div>
+                  </details>
                 </td>
               {% endif %}
             </tr>
@@ -98,4 +151,8 @@
     </div>
     {% include "components/pagination.html" %}
   </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/dataset-list.js' %}" defer></script>
 {% endblock %}

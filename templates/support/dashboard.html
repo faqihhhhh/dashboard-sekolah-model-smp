@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Surat Dukungan{% endblock %}
 {% block content %}
   <section class="page-head">
@@ -38,11 +39,47 @@
     {% endif %}
   </section>
 
-  <form method="get" class="dashboard-card filter-layout support-filters" aria-label="Filter daftar surat">
-    <input class="filter-control" type="search" name="q" value="{{ q }}" placeholder="Nama sekolah atau NPSN" aria-label="Cari sekolah atau NPSN">
-    <select class="filter-control" name="provinsi" aria-label="Provinsi"><option value="">Semua provinsi</option>{% for item in province_options %}<option value="{{ item.kode }}"{% if selected_province == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}</select>
-    <select class="filter-control" name="pengusul" aria-label="Usulan"><option value="">Semua usulan</option>{% for value, label in proposer_options %}<option value="{{ value }}"{% if selected_proposer == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
-    <div class="filter-actions"><button class="button-primary" type="submit">Terapkan</button><a class="button-outline" href="{% url 'support:dashboard' %}">Reset</a></div>
+  <form method="get" class="dashboard-card filter-layout support-filters" aria-label="Filter daftar surat" data-auto-submit-filter>
+    <label class="filter-search">
+      <span>Cari</span>
+      <input class="filter-control" type="search" name="q" value="{{ q }}" placeholder="Nama sekolah atau NPSN..." aria-label="Cari sekolah atau NPSN">
+    </label>
+    <details class="filter-multi" data-multi-filter>
+      <summary class="filter-control">
+        {% if selected_provinces %}Provinsi dipilih ({{ selected_provinces|length }}){% else %}Semua provinsi{% endif %}
+      </summary>
+      <div class="filter-multi-options" aria-label="Pilih provinsi">
+        {% for item in province_options %}
+          <label>
+            <input type="checkbox" name="provinsi" value="{{ item.kode }}"
+                   {% if item.kode in selected_provinces %}checked{% endif %}>
+            <span>{{ item.nama }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </details>
+    <select class="filter-control" name="pengusul" aria-label="Usulan">
+      <option value="">Semua usulan</option>
+      {% for value, label in proposer_options %}
+        <option value="{{ value }}"{% if selected_proposer == value %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    {% if selected_provinces %}
+      <div class="active-filter-chips" aria-label="Provinsi yang dipilih">
+        {% for item in province_options %}
+          {% if item.kode in selected_provinces %}
+            <span class="active-filter-chip">
+              <span>Provinsi: {{ item.nama }}</span>
+              <button type="button" data-remove-province="{{ item.kode }}"
+                      aria-label="Hapus filter provinsi {{ item.nama }}">×</button>
+            </span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="filter-actions filter-actions-auto">
+      <a class="button-outline button-compact filter-reset" href="{% url 'support:dashboard' %}">Reset</a>
+    </div>
   </form>
 
   <section class="dashboard-card support-table-card">
@@ -75,4 +112,8 @@
       </table>
     </div>
   </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/dataset-list.js' %}" defer></script>
 {% endblock %}

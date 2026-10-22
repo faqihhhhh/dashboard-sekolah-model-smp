@@ -45,17 +45,13 @@
   <div class="main-column">
     <header class="topbar">
       <button type="button" class="mobile-menu" @click="sidebarOpen = true" aria-label="Buka menu">☰</button>
-      <form class="global-search" method="get" action="{% url 'sekolah:list' %}">
-        <span aria-hidden="true">⌕</span>
-        <input type="search" name="q" placeholder="Cari sekolah atau NPSN..." aria-label="Cari sekolah atau NPSN">
-      </form>
       <div class="topbar-account">
         {% if user.is_authenticated %}
           <span class="avatar" aria-hidden="true">{{ user.full_name|first|upper }}</span>
           <span class="account-copy"><strong>{{ user.full_name }}</strong><small>{{ user.get_role_display }}</small></span>
-          <a class="account-action" href="{% url 'accounts:password_change' %}">Ubah kata sandi</a>
+          <a class="account-action-password" href="{% url 'accounts:password_change' %}">Ubah kata sandi</a>
           <form method="post" action="{% url 'accounts:logout' %}">
-            {% csrf_token %}<button type="submit" class="account-action">Keluar</button>
+            {% csrf_token %}<button type="submit" class="account-action-logout">Keluar</button>
           </form>
         {% else %}
           <a class="account-action login-action" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Masuk</a>

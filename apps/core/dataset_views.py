@@ -46,9 +46,19 @@ class DatasetListView(ListView):
             queryset = queryset.filter(condition)
 
         for name in spec.filterable_fields(user):
-            value = self.request.GET.get(name, "")
-            if value and value in dict(spec.filter_options(name)):  # nilai asing diabaikan
-                queryset = queryset.filter(**{name: value})
+            values = (
+                self.request.GET.getlist(name)
+                if name == "provinsi"
+                else [self.request.GET.get(name, "")]
+            )
+            valid_values = [
+                value for value in values if value in dict(spec.filter_options(name))
+            ]
+            if valid_values:  # nilai asing diabaikan
+                if name == "provinsi":
+                    queryset = queryset.filter(provinsi__in=valid_values)
+                else:
+                    queryset = queryset.filter(**{name: valid_values[0]})
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -62,8 +72,8 @@ class DatasetListView(ListView):
             row = {"cells": [spec.display(obj, f) for f in fields]}
             if can_edit:
                 row["edit_url"] = spec.url("update", obj.pk)
+                row["info_url"] = spec.url("info", obj.pk)
                 row["delete_url"] = spec.url("delete", obj.pk)
-                row["history_url"] = spec.url("history", obj.pk)
             rows.append(row)
 
         params = self.request.GET.copy()
@@ -78,7 +88,11 @@ class DatasetListView(ListView):
                     "name": name,
                     "label": spec.field_label(name),
                     "options": spec.filter_options(name),
-                    "selected": self.request.GET.get(name, ""),
+                    "selected": (
+                        self.request.GET.getlist(name)
+                        if name == "provinsi"
+                        else self.request.GET.get(name, "")
+                    ),
                 }
                 for name in spec.filterable_fields(user)
             ],
@@ -89,6 +103,33 @@ class DatasetListView(ListView):
             can_edit=can_edit,
             create_url=spec.url("create") if can_edit else None,
             trash_url=spec.url("trash") if has_role(user, Role.SUPER_ADMIN) else None,
+        )
+        return context
+
+
+class DatasetInfoView(RoleRequiredMixin, DetailView):
+    """Rincian satu dataset untuk Admin ke atas."""
+
+    min_role = Role.ADMIN
+    spec = None
+    template_name = "dataset/info.html"
+
+    def get_queryset(self):
+        return self.spec.model.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            spec=self.spec,
+            fields=[
+                {
+                    "label": self.spec.field_label(name),
+                    "value": self.spec.display(self.object, name),
+                }
+                for name in self.spec.list_fields
+            ],
+            back_url=self.spec.url("list"),
+            edit_url=self.spec.url("update", self.object.pk),
         )
         return context
 

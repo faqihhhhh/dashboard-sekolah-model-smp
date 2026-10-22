@@ -13,6 +13,10 @@ class SekolahListView(dv.DatasetListView):
     spec = SEKOLAH
 
 
+class SekolahInfoView(dv.DatasetInfoView):
+    spec = SEKOLAH
+
+
 class SekolahCreateView(dv.DatasetCreateView):
     spec = SEKOLAH
     form_class = SekolahForm

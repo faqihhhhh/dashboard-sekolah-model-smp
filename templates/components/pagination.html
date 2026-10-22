@@ -1,6 +1,6 @@
-{% if page_obj.has_other_pages %}
-  <nav class="flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3 text-xs" aria-label="Halaman">
-    <p class="text-slate-500">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }} · {{ page_obj.paginator.count }} data</p>
+{% if page_obj %}
+  <nav class="pagination flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3 text-xs" aria-label="Halaman">
+    <p>Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}<span class="pagination-separator">·</span>Menampilkan&nbsp;<strong>{{ page_obj.object_list|length }}</strong>&nbsp;dari&nbsp;{{ page_obj.paginator.count }}&nbsp;data</p>
     <div class="flex gap-2">
       {% if page_obj.has_previous %}
         <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" class="button-outline button-compact">&larr; Sebelumnya</a>

@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
-{% block extra_js %}<script src="{% static 'js/province-map.js' %}" defer></script>{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'js/province-map.js' %}" defer></script>
+  <script src="{% static 'js/dataset-list.js' %}" defer></script>
+{% endblock %}
 {% block title %}Beranda{% endblock %}
 {% block content %}
   <section class="dashboard-head">
@@ -21,7 +24,7 @@
     </div>
   </section>
 
-  <form method="get" class="dashboard-card filter-layout home-filters" aria-label="Filter ringkasan sekolah">
+  <form method="get" class="dashboard-card filter-layout home-filters" aria-label="Filter ringkasan sekolah" data-auto-submit-filter>
     <select name="provinsi" class="filter-control" aria-label="Provinsi">
         <option value="">Semua provinsi</option>
         {% for item in provinsi_options %}<option value="{{ item.kode }}"{% if filters.provinsi == item.kode %} selected{% endif %}>{{ item.nama }}</option>{% endfor %}
@@ -35,7 +38,9 @@
     <select name="mapel_kka" class="filter-control" aria-label="Mapel KKA"><option value="">Semua mapel KKA</option>
         {% for value, label in mapel_options %}<option value="{{ value }}"{% if filters.mapel_kka == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
-    <div class="filter-actions"><button class="button-primary" type="submit">Terapkan filter</button><a class="button-outline" href="{% url 'core:home' %}">Reset</a></div>
+    <div class="filter-actions filter-actions-auto">
+      <a class="button-outline button-compact filter-reset" href="{% url 'core:home' %}">Reset</a>
+    </div>
   </form>
 
   <section class="stats-grid" aria-label="Ringkasan sekolah">
