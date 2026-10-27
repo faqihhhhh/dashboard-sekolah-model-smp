@@ -43,11 +43,11 @@ class HasilBaseline(SoftDeleteModel):
         related_name="hasil_baseline",
     )
     skor_pm = models.DecimalField(
-        "skor PM", max_digits=16, decimal_places=10, null=True, blank=True
+        "skor PM", max_digits=30, decimal_places=20, null=True, blank=True
     )
     profil_pm = models.CharField("profil PM", max_length=100, blank=True)
     skor_kka = models.DecimalField(
-        "skor KKA", max_digits=16, decimal_places=10, null=True, blank=True
+        "skor KKA", max_digits=30, decimal_places=20, null=True, blank=True
     )
     profil_kka = models.CharField("profil KKA", max_length=100, blank=True)
     profil_data = models.JSONField("data profil", default=dict, blank=True)

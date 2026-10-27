@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Galeri Praktik Baik{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <div>
+      <h1>Galeri Praktik Baik PM &amp; KKA</h1>
+      <p class="muted">Video pembelajaran dan hasil proyek yang dibagikan sekolah.</p>
+    </div>
+    {% if can_manage %}<a class="button-primary" href="{% url 'galeri:create' %}">Tambah video</a>{% endif %}
+  </section>
+
+  <form method="get" class="dashboard-card galeri-filters">
+    <label><span>Cari video atau sekolah</span><input class="filter-control" type="search" name="q" value="{{ query }}" placeholder="Judul atau nama sekolah"></label>
+    <label><span>Bidang</span><select class="filter-control" name="kerangka"><option value="">Semua bidang</option>{% for value, label in frameworks %}<option value="{{ value }}"{% if framework == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <button class="button-outline" type="submit">Terapkan</button>
+    {% if query or framework %}<a class="button-outline" href="{% url 'galeri:list' %}">Reset</a>{% endif %}
+  </form>
+
+  <section class="galeri-grid" aria-label="Daftar video praktik baik">
+    {% for video in videos %}
+      <article class="dashboard-card galeri-card">
+        {% if video.embed_url %}
+          <div class="galeri-player"><iframe src="{{ video.embed_url }}" title="{{ video.judul }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+        {% else %}
+          <a class="galeri-link-preview" href="{{ video.tautan }}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▶</span><span>Buka video di {{ video.penyedia }}</span></a>
+        {% endif %}
+        <div class="galeri-card-copy">
+          <div class="galeri-card-tags"><span class="card-tag">{{ video.get_kerangka_display }}</span>{% if not video.dipublikasikan %}<span class="badge badge-slate">Draf</span>{% endif %}</div>
+          <h2>{{ video.judul }}</h2>
+          <p class="muted galeri-school">{{ video.sekolah.nama }} · {{ video.sekolah.kabkota.nama }}, {{ video.sekolah.provinsi.nama }}</p>
+          {% if video.deskripsi %}<p>{{ video.deskripsi|linebreaksbr }}</p>{% endif %}
+          {% if can_manage %}<div class="galeri-admin-actions"><a class="button-outline button-compact" href="{% url 'galeri:update' video.pk %}">Ubah</a><form method="post" action="{% url 'galeri:delete' video.pk %}">{% csrf_token %}<button class="button-danger button-compact" type="submit">Hapus</button></form></div>{% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="dashboard-card galeri-empty"><h2>Belum ada video</h2><p class="muted">Video yang dipublikasikan Admin akan tampil di sini.</p>{% if can_manage %}<a class="button-primary" href="{% url 'galeri:create' %}">Tambahkan video pertama</a>{% endif %}</div>
+    {% endfor %}
+  </section>
+{% endblock %}

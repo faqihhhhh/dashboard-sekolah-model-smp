@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.imports",
     "apps.baseline",
     "apps.support",
+    "apps.galeri",
     "simple_history",
 ]
 

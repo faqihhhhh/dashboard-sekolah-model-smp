@@ -44,6 +44,7 @@ from .models import (
     LevelIndikator,
     RatingIndikator,
 )
+from .presentation import build_detail_layout
 
 SESSION_KEY = "baseline_import_wizard"
 STEPS = (
@@ -388,10 +389,10 @@ def import_wizard(request):
 
 
 RATING_COLORS = {
-    RatingIndikator.PRA_BERKEMBANG: "#c56f2f",
-    RatingIndikator.BERKEMBANG: "#d9ad79",
-    RatingIndikator.MAJU: "#79b3d2",
-    RatingIndikator.UNGGUL: "#3d7fa4",
+    RatingIndikator.PRA_BERKEMBANG: "var(--baseline-rating-pra)",
+    RatingIndikator.BERKEMBANG: "var(--baseline-rating-berkembang)",
+    RatingIndikator.MAJU: "var(--baseline-rating-maju)",
+    RatingIndikator.UNGGUL: "var(--baseline-rating-unggul)",
 }
 
 
@@ -425,8 +426,16 @@ def _baseline_donut(period, framework):
     ]
     segments.extend(
         [
-            {"label": "Tidak terkategori", "count": not_categorized, "color": "#8c948d"},
-            {"label": "Belum diisi", "count": missing, "color": "#e7ebe5"},
+            {
+                "label": "Tidak terkategori",
+                "count": not_categorized,
+                "color": "var(--baseline-rating-none)",
+            },
+            {
+                "label": "Belum diisi",
+                "count": missing,
+                "color": "var(--baseline-rating-empty)",
+            },
         ]
     )
     angle = 0.0
@@ -492,7 +501,12 @@ def indicator_guide(request):
 def detail(request, pk):
     if not has_role(request.user, Role.VIEWER):
         raise PermissionDenied
-    baseline = get_object_or_404(HasilBaseline.objects.select_related("sekolah", "periode"), pk=pk)
+    baseline = get_object_or_404(
+        HasilBaseline.objects.select_related(
+            "sekolah", "sekolah__provinsi", "sekolah__kabkota", "periode"
+        ),
+        pk=pk,
+    )
     trend = build_time_chart(
         HasilBaseline.objects.filter(sekolah=baseline.sekolah).select_related("periode"),
         time_field="periode",
@@ -569,21 +583,15 @@ def detail(request, pk):
             messages.success(request, f"{len(updates)} rating baseline disimpan.")
         return redirect("baseline:detail", pk=baseline.pk)
 
-    rows = [
-        {
-            "indicator": indicator,
-            "result": results.get(indicator.pk),
-            "deleted": bool(all_results.get(indicator.pk) and all_results[indicator.pk].is_deleted),
-            "guides": list(indicator.panduan_rating.all()),
-        }
-        for indicator in indicators
-    ]
+    blocks = build_detail_layout(baseline, indicators, results, all_results)
     return render(
         request,
         "baseline/detail.html",
         {
             "baseline": baseline,
-            "rows": rows,
+            "school": baseline.sekolah,
+            "blocks": blocks,
+            "has_rows": any(block["sections"] for block in blocks),
             "is_admin": is_admin,
             "rating_choices": RatingIndikator.choices,
             "trend": trend,

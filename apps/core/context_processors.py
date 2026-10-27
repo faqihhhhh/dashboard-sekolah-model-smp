@@ -24,6 +24,7 @@ NAV = [
             NavItem("Riwayat Impor", "imports:history", Role.ADMIN),
             NavItem("Surat Dukungan", "support:dashboard"),
             NavItem("Baseline Sekolah", "baseline:dashboard"),
+            NavItem("Galeri Praktik Baik PM & KKA", "galeri:list", Role.VIEWER),
         ],
     ),
     (

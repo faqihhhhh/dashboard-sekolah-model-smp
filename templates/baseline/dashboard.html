@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load baseline_format %}
 {% block title %}Baseline Sekolah{% endblock %}
 {% block content %}
   <section class="page-head">
@@ -57,14 +58,14 @@
           <input name="q" value="{{ query }}" placeholder="Cari nama sekolah atau NPSN" aria-label="Cari nama sekolah atau NPSN" class="filter-control">
           <div class="filter-actions"><button class="button-outline" type="submit">Cari</button></div>
         </form>
-        <div class="import-table-wrap"><table class="import-table">
-          <thead><tr><th>NPSN</th><th>Nama sekolah</th><th>Kabupaten/kota</th><th>Skor PM</th><th>Profil PM</th><th>Skor KKA</th><th>Profil KKA</th><th></th></tr></thead>
+        <div class="import-table-wrap"><table class="import-table baseline-results-table">
+          <thead><tr><th style="background-color:#337b9f!important;color:#fff!important">NPSN</th><th style="background-color:#337b9f!important;color:#fff!important">Nama sekolah</th><th style="background-color:#337b9f!important;color:#fff!important">Kabupaten/kota</th><th style="background-color:#337b9f!important;color:#fff!important">Skor PM</th><th style="background-color:#337b9f!important;color:#fff!important">Profil PM</th><th style="background-color:#337b9f!important;color:#fff!important">Skor KKA</th><th style="background-color:#337b9f!important;color:#fff!important">Profil KKA</th><th style="background-color:#337b9f!important;color:#fff!important"></th></tr></thead>
           <tbody>
             {% for row in page_obj %}
               <tr>
                 <td>{{ row.sekolah.npsn }}</td><td>{{ row.sekolah.nama }}</td><td>{{ row.sekolah.kabkota.nama }}</td>
-                <td>{{ row.skor_pm|default:"—" }}</td><td>{{ row.profil_pm|default:"—" }}</td>
-                <td>{{ row.skor_kka|default:"—" }}</td><td>{{ row.profil_kka|default:"—" }}</td>
+                <td>{{ row.skor_pm|trim_decimal|default:"—" }}</td><td>{{ row.profil_pm|default:"—" }}</td>
+                <td>{{ row.skor_kka|trim_decimal|default:"—" }}</td><td>{{ row.profil_kka|default:"—" }}</td>
                 <td><a class="button-outline button-compact" href="{% url 'baseline:detail' row.pk %}">Detail</a></td>
               </tr>
             {% empty %}<tr><td colspan="8" class="text-center text-slate-400">Belum ada data baseline.</td></tr>{% endfor %}

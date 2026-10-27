@@ -1,55 +1,147 @@
 {% extends "base.html" %}
-{% block title %}Baseline {{ baseline.sekolah.nama }}{% endblock %}
+{% block title %}Baseline {{ school.nama }}{% endblock %}
 {% block content %}
-  <section class="page-head">
+  <section class="page-head bl-noprint">
     <div>
-      <h1>{{ baseline.sekolah.nama }}</h1>
-      <p class="muted">NPSN {{ baseline.sekolah.npsn }} · {{ baseline.sekolah.kabkota.nama }} · {{ baseline.periode.nama }}</p>
+      <h1>Detail Baseline</h1>
+      <p class="muted">{{ school.nama }} · Periode {{ baseline.periode.nama }}</p>
     </div>
-    <a href="{% url 'baseline:dashboard' %}?periode={{ baseline.periode_id }}" class="button-outline">Kembali ke daftar</a>
+    <div class="page-head-actions">
+      <a href="{% url 'baseline:dashboard' %}?periode={{ baseline.periode_id }}" class="button-outline">Kembali ke daftar</a>
+      <a href="{% url 'baseline:guide' %}" class="button-outline">Panduan indikator</a>
+    </div>
   </section>
-  <div class="kpi-grid baseline-summary">
-    <article class="dashboard-card kpi-card"><span class="muted">Skor PM</span><strong>{{ baseline.skor_pm|default:"—" }}</strong><span>{{ baseline.profil_pm|default:"Belum ada profil" }}</span></article>
-    <article class="dashboard-card kpi-card"><span class="muted">Skor KKA</span><strong>{{ baseline.skor_kka|default:"—" }}</strong><span>{{ baseline.profil_kka|default:"Belum ada profil" }}</span></article>
-  </div>
-  {% if baseline.profil_data %}
-    <section class="dashboard-card baseline-profile"><h2>Data profil</h2><dl>
-      {% for key, value in baseline.profil_data.items %}<div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>{% endfor %}
-    </dl></section>
-  {% endif %}
 
-  <section class="dashboard-card trend-card">
+  <section class="bl-panel">
+    <header class="bl-panel-head">
+      <h2>Profil Satuan Pendidikan</h2>
+      <button type="button" class="button-outline button-compact bl-noprint" onclick="window.print()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2M7 14h10v7H7z"/></svg>
+        Cetak PDF
+      </button>
+    </header>
+    <div class="bl-profile">
+      <dl class="bl-profile-list">
+        <div>
+          <dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg>Nama</dt>
+          <dd>{{ school.nama }}</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>NPSN</dt>
+          <dd>{{ school.npsn }}</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5"/></svg>Jenjang</dt>
+          <dd>{{ school.get_jenjang_display }}</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3zM9 12l2 2 4-4"/></svg>Status</dt>
+          <dd>{{ school.get_status_display }}</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>Lokasi</dt>
+          <dd>{{ school.kabkota.nama }}, Prov. {{ school.provinsi.nama }}</dd>
+        </div>
+      </dl>
+
+      <div class="bl-summary-cards">
+        {% for block in blocks %}
+          <article class="bl-summary bl-summary--{{ block.framework }}">
+            <h3>{{ block.label }}</h3>
+            {% if block.total %}
+              <div class="bl-summary-bar" role="img" aria-label="Komposisi rating {{ block.label }}">
+                {% for item in block.bar %}<span class="bl-r-{{ item.tone }}" style="flex: {{ item.count }}">{{ item.count }}</span>{% endfor %}
+              </div>
+              <ul class="bl-summary-legend">
+                {% for item in block.legend %}<li class="bl-r-{{ item.tone }}"><i></i>{{ item.label }} ({{ item.count }})</li>{% endfor %}
+              </ul>
+            {% else %}
+              <p class="muted">Belum ada rating indikator.</p>
+            {% endif %}
+            <p class="bl-summary-score">Skor {{ block.framework|upper }}: <strong>{{ block.skor|default_if_none:"—" }}</strong> · Profil: <strong>{{ block.profil|default:"Belum ada profil" }}</strong></p>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+    {% if baseline.profil_data %}
+      <div class="bl-extra">
+        <h3>Data profil</h3>
+        <dl>
+          {% for key, value in baseline.profil_data.items %}<div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>{% endfor %}
+        </dl>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if is_admin %}<form method="post" class="bl-form" x-data="{ editing: false }">{% csrf_token %}{% endif %}
+  <section class="bl-panel">
+    <header class="bl-panel-head">
+      <h2>Perkembangan Sekolah Model</h2>
+      {% if is_admin %}
+        <button type="button" class="button-outline button-compact bl-noprint" @click="editing = !editing" :aria-pressed="editing" x-text="editing ? 'Selesai mengubah' : 'Ubah rating'">Ubah rating</button>
+      {% endif %}
+    </header>
+    <div class="bl-body">
+      {% for block in blocks %}
+        {% if block.sections %}
+          <h3 class="bl-framework">{{ block.label }}</h3>
+          <div class="bl-cards">
+            {% for section in block.sections %}
+              <article class="bl-card bl-tone-{{ section.tone }}{% if section.half %} bl-card--half{% endif %}">
+                <h4 class="bl-card-head">{{ section.letter }}. {{ section.title }}</h4>
+                <div class="bl-groups">
+                  {% for group in section.groups %}
+                    <div class="bl-group">
+                      <h5 class="bl-group-head">{{ group.name }}</h5>
+                      {% for row in group.rows %}
+                        <div class="bl-row" x-data="{ rubric: false }">
+                          <div class="bl-row-main">
+                            <span class="bl-row-name">{{ row.indicator.nama }}{% if row.guides %}<button type="button" class="bl-rubric-toggle bl-noprint" @click="rubric = !rubric" :aria-expanded="rubric" aria-label="Lihat rubrik: {{ row.indicator.nama }}" title="Lihat rubrik">i</button>{% endif %}</span>
+                            <div class="bl-row-rating bl-r-{{ row.tone }}"{% if is_admin %} x-show="!editing"{% endif %}>
+                              <span class="bl-bar" aria-hidden="true">{% for on in row.segments %}<i{% if on %} class="on"{% endif %}></i>{% endfor %}</span>
+                              <span class="bl-badge">{{ row.label }}</span>
+                            </div>
+                            {% if is_admin %}
+                              <div class="bl-row-edit" x-show="editing" x-cloak>
+                                <select name="rating_{{ row.indicator.pk }}" class="filter-control" aria-label="Rating: {{ row.indicator.nama }}"{% if row.deleted %} disabled{% endif %}>
+                                  <option value="">Belum diisi</option>
+                                  {% for value, label in rating_choices %}<option value="{{ value }}"{% if row.rating == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+                                </select>
+                                {% if row.deleted %}<small class="muted">Hasil terhapus perlu dipulihkan</small>{% endif %}
+                              </div>
+                            {% endif %}
+                          </div>
+                          {% if row.guides %}
+                            <div class="bl-rubric" x-show="rubric" x-cloak>
+                              {% for guide in row.guides %}<p><strong>{{ guide.get_rating_display }}</strong> {{ guide.deskripsi }}</p>{% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endfor %}
+      {% if not has_rows %}
+        <p class="muted">Belum ada rating indikator untuk baseline ini.</p>
+      {% endif %}
+    </div>
+    {% if is_admin %}
+      <div class="bl-savebar bl-noprint" x-show="editing" x-cloak>
+        <label>Alasan perubahan<input name="reason" maxlength="100" value="Ubah rating baseline" class="filter-control"></label>
+        <button class="button-primary" type="submit">Simpan rating</button>
+        <button class="button-outline" type="button" @click="$root.reset(); editing = false">Batal</button>
+      </div>
+    {% endif %}
+  </section>
+  {% if is_admin %}</form>{% endif %}
+
+  <section class="dashboard-card trend-card bl-noprint">
     <div><h2>Perkembangan skor per periode</h2><p class="muted">Skor ditampilkan sesuai nilai sumber yang tersimpan.</p></div>
     {% include "components/trend_chart.html" with chart=trend %}
-  </section>
-
-  <section class="dashboard-card indicator-detail-card">
-    <div class="card-heading"><div><h2>Rating indikator Level 3</h2><p class="muted">Uraian rubrik tersedia di Panduan Indikator.</p></div><a href="{% url 'baseline:guide' %}" class="button-outline">Buka panduan</a></div>
-    {% if is_admin %}<form method="post" class="import-form">{% csrf_token %}{% endif %}
-    {% regroup rows by indicator.get_kerangka_display as framework_groups %}
-    {% for group in framework_groups %}
-      <h3 class="indicator-framework-heading">{{ group.grouper }}</h3>
-      <div class="import-table-wrap"><table class="import-table">
-        <thead><tr><th>Kode</th><th>Indikator</th><th>Induk</th><th>Rating</th><th>Rubrik</th></tr></thead>
-        <tbody>
-          {% for row in group.list %}
-            <tr>
-              <td>{{ row.indicator.kode }}</td><td>{{ row.indicator.nama }}</td><td>{{ row.indicator.parent.nama }}</td>
-              <td>
-                {% if is_admin %}
-                  <select name="rating_{{ row.indicator.pk }}" class="filter-control"{% if row.deleted %} disabled{% endif %}>
-                    <option value="">Belum diisi</option>
-                    {% for value, label in rating_choices %}<option value="{{ value }}"{% if row.result.rating == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
-                  </select>
-                  {% if row.deleted %}<span class="muted">Hasil terhapus perlu dipulihkan</span>{% endif %}
-                {% elif row.result %}{{ row.result.get_rating_display|default:"Tidak terkategori" }}{% else %}<span class="muted">Belum diisi</span>{% endif %}
-              </td>
-              <td>{% for guide in row.guides %}<details><summary>{{ guide.get_rating_display }}</summary><p>{{ guide.deskripsi }}</p></details>{% empty %}<span class="muted">—</span>{% endfor %}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table></div>
-    {% endfor %}
-    {% if is_admin %}<div class="import-actions"><label>Alasan perubahan<input name="reason" maxlength="100" value="Ubah rating baseline" class="filter-control"></label><button class="button-primary" type="submit">Simpan rating</button></div></form>{% endif %}
   </section>
 {% endblock %}

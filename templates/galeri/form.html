@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{% if is_update %}Ubah video{% else %}Tambah video{% endif %}{% endblock %}
+{% block content %}
+  <section class="page-head"><div><h1>{% if is_update %}Ubah video praktik baik{% else %}Tambah video praktik baik{% endif %}</h1><p class="muted">Simpan tautan YouTube, Google Drive, Vimeo, atau halaman video lain. File video tidak diunggah ke aplikasi.</p></div></section>
+  <section class="dashboard-card max-w-xl galeri-form-card">
+    <form method="post" class="galeri-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="message message-error">{{ form.non_field_errors }}</div>{% endif %}
+      {% include "components/form_fields.html" %}
+      <p class="muted">Sematan otomatis hanya untuk YouTube, Google Drive, dan Vimeo. Tautan lain ditampilkan sebagai tombol buka di tab baru.</p>
+      <div class="form-actions"><button class="button-primary" type="submit">Simpan video</button><a class="button-outline" href="{% url 'galeri:list' %}">Batal</a></div>
+    </form>
+  </section>
+{% endblock %}

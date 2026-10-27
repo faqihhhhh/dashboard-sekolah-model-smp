@@ -1,8 +1,22 @@
 {% if chart.empty %}
   <p class="muted">Belum ada skor numerik untuk divisualisasikan.</p>
+{% elif chart.labels|length == 1 %}
+  <div class="trend-single-period">
+    <p class="trend-single-period-date">{{ chart.labels.0.label }}</p>
+    <div class="trend-single-period-values">
+      {% for line in chart.lines %}
+        <article class="trend-single-value" style="--trend-color:{{ line.color }}">
+          <span class="trend-single-value-name">{{ line.name }}</span>
+          {% if line.points %}<strong>{{ line.points.0.value }}</strong>{% else %}<strong class="muted">—</strong>{% endif %}
+          <span class="trend-single-value-caption">Skor pada periode ini</span>
+        </article>
+      {% endfor %}
+    </div>
+    <p class="trend-single-period-note">Grafik perkembangan akan terbentuk setelah data periode berikutnya tersedia.</p>
+  </div>
 {% else %}
-  <figure class="trend-chart">
-    <svg viewBox="0 0 100 118" role="img" aria-label="Grafik perkembangan skor berdasarkan periode" preserveAspectRatio="none">
+  <figure class="trend-chart baseline-trend-chart">
+    <svg viewBox="0 0 100 100" role="img" aria-label="Grafik perkembangan skor berdasarkan periode" preserveAspectRatio="none">
       <path class="trend-gridline" d="M0 10H100 M0 50H100 M0 90H100" />
       {% for line in chart.lines %}
         {% if line.points %}
@@ -10,14 +24,16 @@
           {% for point in line.points %}<circle cx="{{ point.x }}" cy="{{ point.y }}" r="1.8" fill="{{ line.color }}" />{% endfor %}
         {% endif %}
       {% endfor %}
-      {% for label in chart.labels %}<text x="{{ label.x }}" y="114">{{ label.label }}</text>{% endfor %}
     </svg>
+    <div class="trend-period-labels" aria-hidden="true">
+      {% for label in chart.labels %}<span style="left:{{ label.x }}%">{{ label.label }}</span>{% endfor %}
+    </div>
     <ul class="trend-legend">
       {% for line in chart.lines %}<li><span style="background:{{ line.color }}"></span>{{ line.name }}</li>{% endfor %}
     </ul>
     <div class="trend-values">
       {% for line in chart.lines %}
-        <section><h3>{{ line.name }}</h3><ul>{% for point in line.points %}<li>{{ point.label }} <strong>{{ point.value }}</strong></li>{% empty %}<li>Belum ada nilai</li>{% endfor %}</ul></section>
+        <section><h3>{{ line.name }}</h3><ul>{% for point in line.points %}<li><span>{{ point.label }}</span><strong>{{ point.value }}</strong></li>{% empty %}<li>Belum ada nilai</li>{% endfor %}</ul></section>
       {% endfor %}
     </div>
   </figure>

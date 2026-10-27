@@ -1,3 +1,4 @@
+import itertools
 from datetime import date
 
 import pytest
@@ -237,3 +238,158 @@ def test_panduan_indikator_dapat_dibaca_guest(client):
 
     assert response.status_code == 200
     assert b"Panduan Indikator" in response.content
+
+
+_KODE = itertools.count(1)
+
+
+def _hierarchy(kerangka, level1_kode, level1_nama, level2_nama, leaf_names, *, with_guides=True):
+    """Buat satu cabang kamus L1 → L2 → beberapa L3. Kembalikan daftar indikator L3."""
+    level1, _ = KamusIndikator.objects.get_or_create(
+        kerangka=kerangka,
+        level=LevelIndikator.L1,
+        kode=level1_kode,
+        defaults={"nama": level1_nama, "urutan": {"Murid": 1, "Guru": 2}.get(level1_kode, 3)},
+    )
+    level2 = KamusIndikator.objects.create(
+        kerangka=kerangka,
+        level=LevelIndikator.L2,
+        kode=f"2.{next(_KODE)}",
+        nama=level2_nama,
+        parent=level1,
+        urutan=1,
+    )
+    leaves = []
+    for index, name in enumerate(leaf_names, start=1):
+        leaf = KamusIndikator.objects.create(
+            kerangka=kerangka,
+            level=LevelIndikator.L3,
+            kode=f"3.{next(_KODE)}",
+            nama=name,
+            parent=level2,
+            urutan=index,
+        )
+        if with_guides:
+            PanduanRating.objects.create(
+                indikator=leaf, rating=RatingIndikator.MAJU, deskripsi=f"Rubrik maju {name}"
+            )
+        leaves.append(leaf)
+    return leaves
+
+
+@pytest.fixture
+def baseline_lengkap(make_sekolah):
+    school = make_sekolah(nama="SMP Tampilan Detail")
+    period = Periode.objects.create(
+        nama="Baseline Tampilan", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    baseline = HasilBaseline.objects.create(
+        sekolah=school, periode=period, skor_pm="2.5", profil_pm="Maju"
+    )
+    pm_murid = _hierarchy(
+        Kerangka.PM, "Murid", "Murid", "Budaya Belajar", ["Memuliakan", "Bermakna"]
+    )
+    pm_kepala = _hierarchy(
+        Kerangka.PM, "Kepala Satpen", "Kepala Satpen", "Pengelolaan Sumber Daya", ["Manajemen"]
+    )
+    kka_guru = _hierarchy(
+        Kerangka.KKA, "Guru", "Guru", "Mengajar secara Efektif", ["Literasi digital"]
+    )
+    # Indikator KKA Murid tanpa rubrik dan tanpa hasil: tidak boleh tampil.
+    kka_murid = _hierarchy(
+        Kerangka.KKA, "Murid", "Murid", "Budaya Belajar", ["Projek tanpa sumber"], with_guides=False
+    )
+    ratings = [
+        (pm_murid[0], RatingIndikator.MAJU),
+        (pm_murid[1], RatingIndikator.BERKEMBANG),
+        (kka_guru[0], RatingIndikator.UNGGUL),
+    ]
+    for indicator, rating in ratings:
+        HasilIndikator.objects.create(hasil_baseline=baseline, indikator=indicator, rating=rating)
+    return baseline, {"pm_murid": pm_murid, "pm_kepala": pm_kepala, "kka_murid": kka_murid}
+
+
+@pytest.mark.django_db
+def test_detail_baseline_menampilkan_profil_ringkasan_dan_bagian_bertingkat(
+    client_as, baseline_lengkap
+):
+    baseline, _ = baseline_lengkap
+
+    response = client_as("viewer").get(reverse("baseline:detail", args=[baseline.pk]))
+    html = response.content.decode()
+
+    assert response.status_code == 200
+    # Profil satuan pendidikan
+    assert "Profil Satuan Pendidikan" in html
+    assert "SMP Tampilan Detail" in html
+    assert "Kota Bandung, Prov. Jawa Barat" in html
+    # Bagian bertingkat dengan huruf berurutan lintas PM dan KKA
+    assert "A. Keunggulan Belajar Murid" in html
+    assert "B. Keunggulan Mengajar Kepala Satuan Pendidikan" in html
+    assert "C. Guru — Koding &amp; Kecerdasan Artifisial" in html
+    assert "Budaya Belajar" in html
+    assert "Memuliakan" in html
+    # Badge rating tiap baris
+    assert ">Maju<" in html
+    assert ">Berkembang<" in html
+    assert ">Unggul<" in html
+    assert ">Belum diisi<" in html  # PM kepala: berrubrik tetapi belum ada hasil
+
+
+@pytest.mark.django_db
+def test_detail_baseline_menyembunyikan_indikator_tanpa_rubrik_dan_hasil(
+    client_as, baseline_lengkap
+):
+    baseline, _ = baseline_lengkap
+
+    html = client_as("viewer").get(reverse("baseline:detail", args=[baseline.pk])).content.decode()
+
+    assert "Projek tanpa sumber" not in html
+
+
+@pytest.mark.django_db
+def test_ringkasan_detail_menghitung_rating_per_kerangka(client_as, baseline_lengkap):
+    baseline, _ = baseline_lengkap
+
+    response = client_as("viewer").get(reverse("baseline:detail", args=[baseline.pk]))
+    pm, kka = response.context["blocks"]
+
+    pm_counts = {item["label"]: item["count"] for item in pm["legend"]}
+    kka_counts = {item["label"]: item["count"] for item in kka["legend"]}
+    assert pm["total"] == 3
+    assert pm_counts["Maju"] == 1
+    assert pm_counts["Berkembang"] == 1
+    assert pm_counts["Belum diisi"] == 1
+    assert kka["total"] == 1
+    assert kka_counts["Unggul"] == 1
+    assert str(pm["skor"]) == "2.5"
+    assert pm["profil"] == "Maju"
+
+
+@pytest.mark.django_db
+def test_kontrol_ubah_rating_hanya_dikirim_ke_admin(client_as, baseline_lengkap):
+    baseline, leaves = baseline_lengkap
+    url = reverse("baseline:detail", args=[baseline.pk])
+    field = f'name="rating_{leaves["pm_murid"][0].pk}"'
+
+    viewer_html = client_as("viewer").get(url).content.decode()
+    assert field not in viewer_html
+    assert 'name="reason"' not in viewer_html
+
+    admin_html = client_as("admin").get(url).content.decode()
+    assert field in admin_html
+    assert 'name="reason"' in admin_html
+
+
+@pytest.mark.django_db
+def test_detail_baseline_tanpa_rating_menampilkan_pesan_kosong(client_as, make_sekolah):
+    school = make_sekolah()
+    period = Periode.objects.create(
+        nama="Baseline Kosong", jenis="baseline", tanggal_mulai=date(2026, 3, 1)
+    )
+    baseline = HasilBaseline.objects.create(sekolah=school, periode=period)
+
+    response = client_as("viewer").get(reverse("baseline:detail", args=[baseline.pk]))
+
+    assert response.status_code == 200
+    assert "Belum ada rating indikator untuk baseline ini." in response.content.decode()
