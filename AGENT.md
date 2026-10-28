@@ -175,8 +175,10 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Dashboard agregat dan donut PM/KKA; Guest tidak menerima data sekolah
   - [x] Panduan indikator publik; detail hasil untuk Viewer+; edit rating ber-riwayat untuk Admin+
   - [x] Kolom Jenjang dari file sumber ditampilkan pada daftar sekolah untuk Viewer+; tidak menambah paparan Guest.
+  - [x] Ringkasan KPI Baseline menata label, angka, periode, dan kerangka PM/KKA dalam kartu yang terpisah dan responsif.
   - [x] Komponen SVG perkembangan generik berdasarkan field waktu; detail sekolah menampilkan tren skor lintas periode
   - [x] Detail baseline per sekolah ditata ulang: kartu Profil Satuan Pendidikan + ringkasan PM/KKA, bagian A–E (kerangka → Level 2 → Level 3) dengan bar rating 4 segmen dan badge, rubrik per indikator (tombol ⓘ), tombol Cetak PDF (cetak browser); Admin mengubah rating lewat tombol “Ubah rating” pada tata letak yang sama. Penyusunan data di `apps/baseline/presentation.py`. Indikator tanpa rubrik dan tanpa hasil disembunyikan, selaras dengan donut. Belum diverifikasi di PostgreSQL/Docker.
+  - [x] Header bagian tabel detail Baseline memakai warna utama tema aplikasi secara seragam; subbagian memakai biru muda yang selaras.
 - [x] **Fase 4 — Beranda** — KPI, peta choropleth 38 provinsi (GeoJSON tanpa API key), tabel per provinsi, filter bersama, endpoint agregat publik; tes Guest
   - [x] Filter bersama untuk KPI dan tabel seluruh provinsi; endpoint agregat hanya mengirim hitungan publik
   - [x] Peta choropleth lokal tanpa CDN, dapat dipilih dengan mouse/keyboard; kode Papua hasil pemekaran dipetakan eksplisit dan dicocokkan ke kode Kemendagri
@@ -198,6 +200,7 @@ Admin tidak dibatasi wilayah. Kolom publik Sekolah untuk Guest: NPSN, nama, prov
   - [x] Halaman ubah kata sandi sendiri dan halaman 404/500 ditambahkan.
 - [ ] **Fase 8 — Setelah rilis** — Kurasi & RTL (butuh spesifikasi), ekspor, edit massal, MFA, analitik/prediksi (peran DB read-only, pandas; baru bermakna setelah beberapa periode)
   - [x] Galeri Praktik Baik PM & KKA: tautan YouTube/Drive/Vimeo/HTTPS lain, moderasi publikasi oleh Admin, akses hanya pengguna login; berkas video tidak disimpan di server. Django check dan lint lulus; PostgreSQL/Docker dan browser belum diverifikasi.
+  - [x] Deskripsi kartu galeri diringkas menjadi 24 kata; saat dibuka, cuplikan diganti deskripsi lengkap agar tidak berulang.
 - [ ] **Backlog** — aturan hapus Periode, audit aksesibilitas
   - [x] README pengembangan dan operasional ditambahkan.
   - [x] CI GitHub Actions menjalankan Django check, lint, dan tes dengan PostgreSQL 17.

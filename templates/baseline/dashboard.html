@@ -22,9 +22,17 @@
   </form>
 
   {% if period %}
-    <div class="kpi-grid">
-      <article class="dashboard-card kpi-card"><span class="muted">Sekolah dengan data</span><strong>{{ baseline_count }}</strong><span class="muted">Periode {{ period.nama }}</span></article>
-      <article class="dashboard-card kpi-card"><span class="muted">Tipe indikator</span><strong>2</strong><span class="muted">PM dan KKA</span></article>
+    <div class="baseline-kpi-grid">
+      <article class="dashboard-card baseline-kpi-card">
+        <span class="baseline-kpi-label">Sekolah dengan data</span>
+        <strong>{{ baseline_count }}</strong>
+        <div class="baseline-kpi-meta"><span>Periode</span><strong>{{ period.nama }}</strong></div>
+      </article>
+      <article class="dashboard-card baseline-kpi-card">
+        <span class="baseline-kpi-label">Tipe indikator</span>
+        <strong>2</strong>
+        <div class="baseline-kpi-meta"><span>Kerangka penilaian</span><strong>PM dan KKA</strong></div>
+      </article>
     </div>
 
     <div class="baseline-donut-grid">

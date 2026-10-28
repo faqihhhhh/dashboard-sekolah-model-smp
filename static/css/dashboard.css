@@ -1912,6 +1912,49 @@ textarea {
   gap: 16px;
 }
 
+.baseline-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.baseline-kpi-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.baseline-kpi-label {
+  color: #65747c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.baseline-kpi-card > strong {
+  color: var(--dashboard-primary);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: 1.15;
+}
+
+.baseline-kpi-meta {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--dashboard-muted);
+  font-size: 12px;
+}
+
+.baseline-kpi-meta strong {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .baseline-donut-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 150px;
@@ -2633,6 +2676,10 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .baseline-kpi-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .baseline-donut-card {
     grid-template-columns: minmax(0, 1fr) 116px;
   }
@@ -3031,13 +3078,6 @@ textarea:focus-visible {
   grid-column: 1 / -1;
 }
 
-/* PM memakai keluarga biru; KKA keluarga abu-biru (selaras warna garis tren PM/KKA) */
-.bl-tone-cyan { --accent: #337b9f; }
-.bl-tone-teal { --accent: #286482; }
-.bl-tone-navy { --accent: #2f3e47; }
-.bl-tone-purple { --accent: #596871; }
-.bl-tone-blue { --accent: #3c657d; }
-
 .bl-card-head {
   margin: 0;
   padding: 12px 18px;
@@ -3070,7 +3110,7 @@ textarea:focus-visible {
   margin: 0;
   padding: 9px 18px;
   border-left: 3px solid var(--accent);
-  background: #f3f7f9;
+  background: #f0f6f9;
   color: var(--accent);
   font-size: 13px;
   font-weight: 700;
@@ -3359,6 +3399,44 @@ textarea:focus-visible {
 
 .galeri-school {
   font-size: 13px;
+}
+
+.galeri-description summary {
+  display: block;
+  color: #475569;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.6;
+  list-style: none;
+}
+
+.galeri-description summary::-webkit-details-marker {
+  display: none;
+}
+
+.galeri-description-toggle {
+  color: #475569 !important;
+  white-space: nowrap;
+}
+
+.galeri-description-toggle::after {
+  content: "⌄";
+}
+
+.galeri-description-full {
+  display: none;
+}
+
+.galeri-description[open] .galeri-description-short {
+  display: none;
+}
+
+.galeri-description[open] .galeri-description-full {
+  display: inline;
+}
+
+.galeri-description[open] .galeri-description-toggle::after {
+  content: "⌃";
 }
 
 .galeri-card-tags,

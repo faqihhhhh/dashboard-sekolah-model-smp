@@ -28,7 +28,7 @@
           <div class="galeri-card-tags"><span class="card-tag">{{ video.get_kerangka_display }}</span>{% if not video.dipublikasikan %}<span class="badge badge-slate">Draf</span>{% endif %}</div>
           <h2>{{ video.judul }}</h2>
           <p class="muted galeri-school">{{ video.sekolah.nama }} · {{ video.sekolah.kabkota.nama }}, {{ video.sekolah.provinsi.nama }}</p>
-          {% if video.deskripsi %}<p>{{ video.deskripsi|linebreaksbr }}</p>{% endif %}
+          {% if video.deskripsi %}<details class="galeri-description"><summary><span class="galeri-description-short">{{ video.deskripsi|truncatewords:24 }}</span><span class="galeri-description-full">{{ video.deskripsi|linebreaksbr }}</span><span class="galeri-description-toggle" aria-hidden="true"></span></summary></details>{% endif %}
           {% if can_manage %}<div class="galeri-admin-actions"><a class="button-outline button-compact" href="{% url 'galeri:update' video.pk %}">Ubah</a><form method="post" action="{% url 'galeri:delete' video.pk %}">{% csrf_token %}<button class="button-danger button-compact" type="submit">Hapus</button></form></div>{% endif %}
         </div>
       </article>
